@@ -180,10 +180,10 @@ Everything needed to train, evaluate and re-analyse the model is in this reposit
 | Path | Content | Source |
 |---|---|---|
 | `data/41586_2025_8916_MOESM5_ESM.xlsx` | Table S3 (sheets S3A binding, S3B occupancy, S3C log2FC) | Mahendrawada et al., *Nature* 642:796–804 (2025), supplementary data |
-| `data/tpm/DMSO_expression.txt`, `DMSO_mean.txt`, `3IAA_mean.txt` | Wild-type TPM (median over DMSO controls) and per-depletion replicate means | ‹FILL 1: how these files were derived from the depletion RNA-seq, GEO GSE236947› |
+| `data/tpm/DMSO_expression.txt`, `DMSO_mean.txt`, `3IAA_mean.txt` | Wild-type TPM (median over DMSO controls) and per-depletion replicate means | Aggregated from the per-sample files of GSE236947; DMSO_expression = median over DMSO controls (TPM), *_mean = replicate mean per depletion |
 | `data/S288C.fsa` | *S. cerevisiae* reference genome (sacCer3 / S288C) | SGD / NCBI |
 | `data/SGD_features.tab` | SGD feature table (name → systematic name); also used for TF-name mapping in training and analysis | SGD |
-| `data/tss.bed` | Anchor coordinates: ORF start codon, **not** the true TSS | ‹FILL 2: how this file was produced and from which annotation› |
+| `data/tss.bed` | Anchor coordinates: ORF start codon, **not** the true TSS | SGD |
 | `data/motif/JASPAR2024_CORE_fungi_non-redundant_pfms_meme.txt`, `data/motif/ALIGNED_ENOLOGO_FORMAT_PWMS/` | Motif PWMs | JASPAR 2024, YeTFaSCo |
 
 ### 6.2 ChEC-seq bigWig files (not included)
