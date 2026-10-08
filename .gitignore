@@ -15,3 +15,6 @@
 *.pt
 *.bak_*
 __pycache__/
+data/ChEC-seq/*.bw
+out/checkpoints/
+*.pt
