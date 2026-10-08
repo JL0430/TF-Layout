@@ -1,0 +1,288 @@
+====================================================================================================
+论文表格 + 训练随机性噪声底(27 号 v6.2，第16批c 2026-10-02g)  2026-10-03 13:53:15  主模型=v8_headA_all/perhead
+====================================================================================================
+
+[0] 输入盘点(来源目录 / 修改时间)
+  主模型导出                              2026-09-30 18:05   out/results/v8_headA_all/predictions_test.parquet
+  第9批 19号(主结果、v8对v3)                 2026-09-29 16:58   out/results/_compare/headline_all_seeds.csv
+  第9批 25号(Head A 1108基因)             2026-09-29 16:59   out/results/_head_a_all/metrics_all_seeds.csv
+  26号 基线                             2026-10-02 10:36   out/results/_baselines/table2_head_bc.csv
+  消融 19号 _compare_b11                2026-10-01 16:38   out/results/_compare_b11/delta_vs_reference.csv
+  消融 19号 _compare_b10                2026-10-01 03:24   out/results/_compare_b10/delta_vs_reference.csv
+  消融 25号 _head_a_all_b11             2026-10-01 16:39   out/results/_head_a_all_b11/delta_vs_reference.csv
+  消融 25号 _head_a_all_b10             2026-10-01 03:28   out/results/_head_a_all_b10/delta_vs_reference.csv
+  val: 84692 对(基因×被耗竭TF)，683 个基因 × 124 个 TF；显著 3053(down 1777 / up 1276)；D∈L_g 占 13.1%
+  test: 101680 对(基因×被耗竭TF)，820 个基因 × 124 个 TF；显著 3976(down 2123 / up 1853)；D∈L_g 占 13.8%
+
+[1] 训练随机性零分布(同配置 v8 的 k-seed 集成两两相减；k=1：10 对单 seed；k=2：15 组互不重叠的 2+2；同一 test 集、不重采样)
+  perhead: seed [42, 123, 456, 789, 2024]，单 seed 集成 5 个、2-seed 集成 10 个已算(累计 28 秒)
+  selected: seed [42, 123, 456, 789, 2024]，单 seed 集成 5 个、2-seed 集成 10 个已算(累计 56 秒)
+  Head A 全基因：读 out/results/_head_a_all_b11/per_gene_head_a.csv，v8_headA_all 的 seed [123, 2024, 42, 456, 789]
+  均方根 rms(最大|Δ|)，perhead：
+    test   k=2: A_r 0.010(0.017) k1 0.019  B_r 0.004(0.006) k1 0.006  B_r|TF 0.007(0.012) k1 0.011  B_sign 0.007(0.016) k1 0.015  C_AUCdn 0.003(0.006) k1 0.006  C_APdn 0.006(0.011) k1 0.013  C_APup 0.010(0.016) k1 0.012  C_mF1 0.006(0.008) k1 0.007
+    D∈L_g  k=2: B_r 0.012(0.022) k1 0.018  B_r|TF 0.015(0.023) k1 0.024  B_sign 0.012(0.022) k1 0.025  C_AUCdn 0.004(0.007) k1 0.006  C_APdn 0.005(0.010) k1 0.008  C_APup 0.006(0.011) k1 0.013  C_mF1 0.006(0.012) k1 0.009
+    D∉L_g  k=2: B_r 0.010(0.020) k1 0.014  B_r|TF 0.011(0.020) k1 0.015  B_sign 0.008(0.016) k1 0.013  C_AUCdn 0.004(0.007) k1 0.008  C_APdn 0.008(0.015) k1 0.016  C_APup 0.012(0.019) k1 0.016  C_mF1 0.006(0.010) k1 0.007
+    Head A 全基因 test k=2: 全部 0.011(k1 0.019)  网格 0.010(k1 0.019)  网格外 0.021(k1 0.029)  网格外有位点 0.058(k1 0.072)  网格外无位点 0.054(k1 0.067)
+    Head A 全基因 val k=2: 全部 0.006(k1 0.011)  网格 0.015(k1 0.022)  网格外 0.006(k1 0.012)  网格外有位点 0.028(k1 0.044)  网格外无位点 0.020(k1 0.025)
+  rms_2/rms_1 实测中位 0.57(范围 0.46~0.79；方差按 1/k 缩的理论值 0.71。偏离很大时 k≥3 的外推别信)
+  读法：两个 2-seed 集成之间、只因换 seed 就能差出 rms 这么多；比较 2 对 2 的消融时，|Δ| 至少要明显大于 ~2×rms 才算
+  超出训练随机性。下面 [4][5] 的"合成区间"把它和 test 抽样噪声合在一起。
+
+[2] Table 1 主结果(v8_headA_all，5-seed 集成；来源 out/results/_compare/headline_all_seeds.csv 等)
+  B/C(test 全部行)：
+    perhead        A_r                        0.593[0.548,0.643]  逐seed 0.538±0.012
+    perhead        B_r                        0.635[0.597,0.674]  逐seed 0.599±0.004
+    perhead        B_sign                     0.778[0.751,0.801]  逐seed 0.753±0.010
+    perhead        B_r|TF                     0.592[0.550,0.637]  逐seed 0.554±0.007
+    perhead        B_dr                       0.369[0.339,0.396]  逐seed 0.332±0.006
+    perhead        B_drns                     0.202[0.179,0.225]  逐seed 0.177±0.008
+    perhead        C_AUCdn                    0.911[0.895,0.923]  逐seed 0.893±0.004
+    perhead        C_APdn                     0.388[0.350,0.426]  逐seed 0.350±0.008
+    perhead        C_AUCup                    0.892[0.880,0.905]  逐seed 0.872±0.006
+    perhead        C_APup                     0.263[0.231,0.298]  逐seed 0.235±0.008
+    perhead        C_mF1                      0.569[0.554,0.583]  逐seed 0.550±0.005
+    perhead+stack  C_AUCdn                    0.921[0.909,0.931]
+    perhead+stack  C_APdn                     0.386[0.351,0.423]
+    perhead+stack  C_AUCup                    0.898[0.886,0.909]
+    perhead+stack  C_APup                     0.266[0.236,0.298]
+    perhead+stack  C_mF1                      0.567[0.553,0.580]
+  Head A(1108 基因分层)：
+    perhead        A_r:全部                     0.728[0.694,0.759]  逐seed 0.682±0.012
+    perhead        A_r:网格                     0.593[0.544,0.642]  逐seed 0.538±0.012
+    perhead        A_r:网格外                    0.737[0.674,0.793]  逐seed 0.690±0.018
+    perhead        A_r:网格外有位点                 0.571[0.410,0.702]  逐seed 0.499±0.045
+    perhead        A_r:网格外无位点                 0.369[0.223,0.513]  逐seed 0.294±0.042
+    perhead        A_r:组内中心化                  0.563[0.514,0.611]
+  Head C TF 内 AUROC：
+    perhead        wTF_pooled_dn              0.774[0.750,0.799]
+    perhead        wTF_median_dn              0.764[0.736,0.809]
+    perhead        wTF_pooled_up              0.754[0.728,0.774]
+    perhead        wTF_median_up              0.751[0.719,0.791]
+
+[3] Table 2(Head B/C 对基线)、Table 3(Head A 对基线)；来源 out/results/_baselines/table*.csv(26 号)
+                                      B_r   B_sign   B_r|TF  C_AUCdn  C_AUCup   C_APdn   C_APup    C_mF1   wtf_dn   wtf_up
+    B1 TF mean                      0.347    0.587      nan    0.891    0.856    0.171    0.133    0.454    0.500    0.500
+    B2 TF x binding prior           0.391    0.610    0.192    0.896    0.868    0.216    0.144    0.465    0.560    0.557
+    B3 gene-only                    0.431    0.673    0.410    0.651    0.629    0.037    0.031    0.349    0.671    0.642
+    B4 pair+TF prior                0.415    0.617    0.257    0.899    0.873    0.237    0.159    0.482    0.589    0.627
+    B5 B4+WT expr                   0.525    0.697    0.434    0.906    0.876    0.272    0.179    0.508    0.689    0.666
+    B6 GBDT(B5 feats)               0.606    0.712    0.534    0.911    0.882    0.281    0.208    0.524    0.704    0.698
+    B7a GBDT+flat layout            0.620    0.762    0.548    0.918    0.898    0.338    0.242    0.544    0.750    0.745
+    B7a-bag GBDT+flat (bagged)      0.627    0.763    0.558    0.921    0.899    0.357    0.248    0.549    0.761    0.755
+    B7b GBDT+flat layout+WT         0.693    0.785    0.642    0.926    0.900    0.367    0.271    0.569    0.785    0.767
+    B7b-bag GBDT+flat+WT (bagge     0.700    0.792    0.650    0.928    0.903    0.384    0.283    0.570    0.793    0.776
+    Oracle same gene                0.458    0.817    0.468      nan      nan      nan      nan      nan      nan      nan
+    TF-Layout (ours)                0.635    0.778    0.592    0.911    0.892    0.388    0.263    0.569    0.774    0.754
+    TF-Layout + B6 (stacked)        0.693    0.775    0.645    0.925    0.902    0.402    0.280    0.576      nan      nan
+    TF-Layout + B7a-bag (stacke     0.668    0.789    0.614    0.926    0.904    0.400    0.276    0.577      nan      nan
+    TF-Layout + B7b-bag (stacke     0.723    0.805    0.678    0.932    0.909    0.423    0.298    0.587      nan      nan
+                                           All            Grid        Off-grid       Off+sites    Off,no-sites    All,centered
+    A1 layout ridge                      0.604           0.340           0.656           0.288             nan           0.304
+    A2 token ridge                       0.365           0.228           0.398           0.425           0.281           0.264
+    A3 layout+token                      0.646           0.405           0.704           0.503           0.273           0.396
+    A2k 6-mer ridge                      0.251           0.283           0.180           0.439           0.052           0.265
+    A3k layout+6-mer                     0.629           0.392           0.676           0.507          -0.025           0.362
+    A4 GBDT layout+token                 0.639           0.387           0.711           0.507           0.285           0.392
+    A4k GBDT layout+6-mer                0.636           0.409           0.686           0.508           0.064           0.388
+    TF-Layout (ours)                     0.728           0.593           0.737           0.571           0.369           0.563
+
+[4] Table 4 消融(在 v8_headA_all 上；参照 v8_headA_all/perhead；自动取 seed 最多的来源)。†=bootstrap CI 不含0(只含 test 抽样)；‡=合成区间不含0(再加训练随机性)；§=保守合成区间不含0(k≥3 时不外推，只标在 k≥3 的行)
+  w/o layout(v10_abl_no_layout)：B/C 来自 out/results/_compare_b10/delta_vs_reference.csv(seed [42, 123])；Head A 全基因来自 out/results/_head_a_all_b10/delta_vs_reference.csv(seed [42, 123])
+  w/o site deletion(v10_abl_no_knockout)：B/C 来自 out/results/_compare_b11/delta_vs_reference.csv(seed [42, 123, 456, 789, 2024])；Head A 全基因来自 out/results/_head_a_all_b11/delta_vs_reference.csv(seed [42, 123, 456, 789, 2024])
+  w/o cis(v10_abl_no_cis)：B/C 来自 out/results/_compare_b10/delta_vs_reference.csv(seed [42, 123])；Head A 全基因来自 out/results/_head_a_all_b10/delta_vs_reference.csv(seed [42, 123])
+  lambda_A=0.3(v10_lambda_a03)：B/C 来自 out/results/_compare_b10/delta_vs_reference.csv(seed [42, 123])；Head A 全基因来自 out/results/_head_a_all_b10/delta_vs_reference.csv(seed [42, 123])
+  ── w/o layout  (k=2 seed 对 2 seed)
+      A_r      Δ=-0.3111†‡  test CI(-0.383,-0.241)  噪声 rms 0.0103[实测k=2]  合成(-0.385,-0.237)  逐seed -0.3049(0/2，符号检验双侧p=0.500)
+      B_r      Δ=-0.2970†‡  test CI(-0.341,-0.250)  噪声 rms 0.0037[实测k=2]  合成(-0.343,-0.251)  逐seed -0.3063(0/2，符号检验双侧p=0.500)
+      B_r|TF   Δ=-0.3213†‡  test CI(-0.376,-0.267)  噪声 rms 0.0067[实测k=2]  合成(-0.377,-0.265)  逐seed -0.3261(0/2，符号检验双侧p=0.500)
+      B_sign   Δ=-0.1627†‡  test CI(-0.198,-0.126)  噪声 rms 0.0070[实测k=2]  合成(-0.201,-0.124)  逐seed -0.1601(0/2，符号检验双侧p=0.500)
+      C_AUCdn  Δ=-0.0133†‡  test CI(-0.024,-0.002)  噪声 rms 0.0031[实测k=2]  合成(-0.026,-0.001)  逐seed -0.0061(0/2，符号检验双侧p=0.500)
+      C_AUCup  Δ=-0.0299†‡  test CI(-0.042,-0.017)  噪声 rms 0.0053[实测k=2]  合成(-0.046,-0.013)  逐seed -0.0177(0/2，符号检验双侧p=0.500)
+      C_APdn   Δ=-0.1949†‡  test CI(-0.227,-0.162)  噪声 rms 0.0064[实测k=2]  合成(-0.230,-0.160)  逐seed -0.1754(0/2，符号检验双侧p=0.500)
+      C_APup   Δ=-0.1096†‡  test CI(-0.138,-0.080)  噪声 rms 0.0097[实测k=2]  合成(-0.144,-0.075)  逐seed -0.0939(0/2，符号检验双侧p=0.500)
+      C_mF1    Δ=-0.0963†‡  test CI(-0.111,-0.082)  噪声 rms 0.0055[实测k=2]  合成(-0.114,-0.078)  逐seed -0.0912(0/2，符号检验双侧p=0.500)
+      Head A 全基因 test: 全部 -0.262†‡  网格 -0.311†‡  网格外 -0.207†‡  网格外有位点 -0.154†  网格外无位点 +0.011
+      Head A 全基因 val : 全部 -0.206†‡  网格 -0.233†‡  网格外 -0.170†‡  网格外有位点 -0.129  网格外无位点 +0.064
+  ── w/o site deletion  (k=5 seed 对 5 seed)
+      A_r      Δ=-0.0204    test CI(-0.040,+0.001)  噪声 rms 0.0065[外推k=5]  合成(-0.044,+0.004)  保守(-0.049,+0.008)  逐seed -0.0169(2/5，符号检验双侧p=1.000)
+      B_r      Δ=-0.0122    test CI(-0.027,+0.003)  噪声 rms 0.0023[外推k=5]  合成(-0.028,+0.003)  保守(-0.029,+0.004)  逐seed -0.0100(2/5，符号检验双侧p=1.000)
+      B_r|TF   Δ=-0.0144    test CI(-0.030,+0.001)  噪声 rms 0.0043[外推k=5]  合成(-0.032,+0.003)  保守(-0.035,+0.006)  逐seed -0.0115(2/5，符号检验双侧p=1.000)
+      B_sign   Δ=+0.0050    test CI(-0.006,+0.016)  噪声 rms 0.0044[外推k=5]  合成(-0.009,+0.019)  保守(-0.013,+0.023)  逐seed +0.0087(4/5，符号检验双侧p=0.375)
+      C_AUCdn  Δ=-0.0012    test CI(-0.006,+0.003)  噪声 rms 0.0020[外推k=5]  合成(-0.007,+0.005)  保守(-0.009,+0.006)  逐seed -0.0005(2/5，符号检验双侧p=1.000)
+      C_AUCup  Δ=-0.0029    test CI(-0.008,+0.002)  噪声 rms 0.0034[外推k=5]  合成(-0.011,+0.005)  保守(-0.014,+0.009)  逐seed -0.0013(3/5，符号检验双侧p=1.000)
+      C_APdn   Δ=-0.0254†‡§ test CI(-0.038,-0.012)  噪声 rms 0.0040[外推k=5]  合成(-0.041,-0.010)  保守(-0.043,-0.007)  逐seed -0.0268(0/5，符号检验双侧p=0.062)
+      C_APup   Δ=-0.0073    test CI(-0.018,+0.003)  噪声 rms 0.0062[外推k=5]  合成(-0.023,+0.009)  保守(-0.029,+0.014)  逐seed -0.0051(2/5，符号检验双侧p=1.000)
+      C_mF1    Δ=-0.0130†‡  test CI(-0.022,-0.005)  噪声 rms 0.0035[外推k=5]  合成(-0.024,-0.002)  保守(-0.027,+0.000)  逐seed -0.0060(2/5，符号检验双侧p=1.000)
+      Head A 全基因 test: 全部 -0.007  网格 -0.020†  网格外 -0.001  网格外有位点 +0.009  网格外无位点 +0.007
+      Head A 全基因 val : 全部 -0.001  网格 -0.009  网格外 -0.001  网格外有位点 -0.013  网格外无位点 +0.035
+  ── w/o cis  (k=2 seed 对 2 seed)
+      A_r      Δ=-0.0117    test CI(-0.056,+0.036)  噪声 rms 0.0103[实测k=2]  合成(-0.062,+0.039)  逐seed +0.0013(1/2，符号检验双侧p=1.000)
+      B_r      Δ=+0.0008    test CI(-0.021,+0.025)  噪声 rms 0.0037[实测k=2]  合成(-0.023,+0.025)  逐seed +0.0014(1/2，符号检验双侧p=1.000)
+      B_r|TF   Δ=+0.0044    test CI(-0.020,+0.031)  噪声 rms 0.0067[实测k=2]  合成(-0.024,+0.033)  逐seed +0.0053(1/2，符号检验双侧p=1.000)
+      B_sign   Δ=-0.0020    test CI(-0.019,+0.014)  噪声 rms 0.0070[实测k=2]  合成(-0.023,+0.019)  逐seed +0.0015(1/2，符号检验双侧p=1.000)
+      C_AUCdn  Δ=+0.0019    test CI(-0.005,+0.008)  噪声 rms 0.0031[实测k=2]  合成(-0.007,+0.011)  逐seed +0.0019(2/2，符号检验双侧p=0.500)
+      C_AUCup  Δ=-0.0061    test CI(-0.015,+0.003)  噪声 rms 0.0053[实测k=2]  合成(-0.020,+0.008)  逐seed -0.0024(1/2，符号检验双侧p=1.000)
+      C_APdn   Δ=+0.0053    test CI(-0.011,+0.023)  噪声 rms 0.0064[实测k=2]  合成(-0.016,+0.026)  逐seed +0.0073(2/2，符号检验双侧p=0.500)
+      C_APup   Δ=+0.0043    test CI(-0.011,+0.019)  噪声 rms 0.0097[实测k=2]  合成(-0.020,+0.029)  逐seed +0.0042(2/2，符号检验双侧p=0.500)
+      C_mF1    Δ=-0.0002    test CI(-0.010,+0.008)  噪声 rms 0.0055[实测k=2]  合成(-0.014,+0.014)  逐seed +0.0000(1/2，符号检验双侧p=1.000)
+      Head A 全基因 test: 全部 -0.004  网格 -0.012  网格外 -0.002  网格外有位点 +0.029  网格外无位点 无定义(常数预测)
+      Head A 全基因 val : 全部 -0.024  网格 -0.043  网格外 -0.008  网格外有位点 -0.058  网格外无位点 无定义(常数预测)
+  ── lambda_A=0.3  (k=2 seed 对 2 seed)
+      A_r      Δ=-0.0117    test CI(-0.036,+0.014)  噪声 rms 0.0103[实测k=2]  合成(-0.044,+0.020)  逐seed -0.0122(1/2，符号检验双侧p=1.000)
+      B_r      Δ=+0.0012    test CI(-0.013,+0.015)  噪声 rms 0.0037[实测k=2]  合成(-0.014,+0.017)  逐seed -0.0018(0/2，符号检验双侧p=0.500)
+      B_r|TF   Δ=+0.0006    test CI(-0.016,+0.016)  噪声 rms 0.0067[实测k=2]  合成(-0.020,+0.021)  逐seed -0.0023(0/2，符号检验双侧p=0.500)
+      B_sign   Δ=-0.0015    test CI(-0.022,+0.019)  噪声 rms 0.0070[实测k=2]  合成(-0.026,+0.023)  逐seed -0.0008(1/2，符号检验双侧p=1.000)
+      C_AUCdn  Δ=+0.0080†   test CI(+0.003,+0.013)  噪声 rms 0.0031[实测k=2]  合成(-0.000,+0.016)  逐seed +0.0086(2/2，符号检验双侧p=0.500)
+      C_AUCup  Δ=+0.0038    test CI(-0.002,+0.010)  噪声 rms 0.0053[实测k=2]  合成(-0.008,+0.016)  逐seed +0.0058(2/2，符号检验双侧p=0.500)
+      C_APdn   Δ=-0.0149†   test CI(-0.029,-0.000)  噪声 rms 0.0064[实测k=2]  合成(-0.034,+0.004)  逐seed -0.0123(1/2，符号检验双侧p=1.000)
+      C_APup   Δ=+0.0122    test CI(-0.002,+0.025)  噪声 rms 0.0097[实测k=2]  合成(-0.011,+0.036)  逐seed +0.0076(2/2，符号检验双侧p=0.500)
+      C_mF1    Δ=+0.0040    test CI(-0.004,+0.012)  噪声 rms 0.0055[实测k=2]  合成(-0.009,+0.017)  逐seed +0.0012(1/2，符号检验双侧p=1.000)
+      Head A 全基因 test: 全部 -0.005  网格 -0.012  网格外 -0.008  网格外有位点 -0.022  网格外无位点 -0.032
+      Head A 全基因 val : 全部 -0.026†‡  网格 -0.023  网格外 -0.042†‡  网格外有位点 -0.110†‡  网格外无位点 -0.076
+
+[5] Table 5 分层(D∈L_g=被耗竭 TF 在该基因启动子上有位点)：模型对 B4/B6(26 号 [2c]) + 消融(19 号 [6])
+  模型−基线  B2_TF×结合先验             D∈L_g: B_r +0.089†  B_r|TF nan  C_AUCdn +0.017†  C_APdn +0.195†  C_APup +0.160†
+  模型−基线  B2_TF×结合先验             D∉L_g: B_r +0.375†  B_r|TF nan  C_AUCdn +0.016†  C_APdn +0.175†  C_APup +0.109†
+  模型−基线  B4_pair+TF先验           D∈L_g: B_r +0.085†  B_r|TF +0.309†  C_AUCdn +0.006  C_APdn +0.147†  C_APup +0.129†
+  模型−基线  B4_pair+TF先验           D∉L_g: B_r +0.324†  B_r|TF +0.416†  C_AUCdn +0.014†  C_APdn +0.158†  C_APup +0.092†
+  模型−基线  B5_B4+实测WT表达           D∈L_g: B_r -0.003  B_r|TF +0.032  C_AUCdn -0.000  C_APdn +0.086†  C_APup +0.094†
+  模型−基线  B5_B4+实测WT表达           D∉L_g: B_r +0.185†  B_r|TF +0.222†  C_AUCdn +0.006  C_APdn +0.133†  C_APup +0.080†
+  模型−基线  B6_gbdt(同B5特征)         D∈L_g: B_r -0.081†  B_r|TF -0.097†  C_AUCdn -0.007  C_APdn +0.067†  C_APup +0.049†
+  模型−基线  B6_gbdt(同B5特征)         D∉L_g: B_r +0.100†  B_r|TF +0.127†  C_AUCdn +0.001  C_APdn +0.132†  C_APup +0.056†
+  模型−基线  B7a_gbdt+flat(无WT)     D∈L_g: B_r -0.036  B_r|TF +0.000  C_AUCdn -0.013†  C_APdn +0.053†  C_APup +0.068†
+  模型−基线  B7a_gbdt+flat(无WT)     D∉L_g: B_r +0.044†  B_r|TF +0.063†  C_AUCdn -0.007  C_APdn +0.044†  C_APup +0.004
+  模型−基线  B7b_gbdt+flat(+WT)     D∈L_g: B_r -0.114†  B_r|TF -0.154†  C_AUCdn -0.016†  C_APdn +0.016  C_APup +0.022
+  模型−基线  B7b_gbdt+flat(+WT)     D∉L_g: B_r -0.025  B_r|TF -0.014  C_AUCdn -0.016†  C_APdn +0.022  C_APup -0.019†
+  模型−基线  B7a_bag(无WT)           D∈L_g: B_r -0.032  B_r|TF +0.007  C_AUCdn -0.017†  C_APdn +0.026  C_APup +0.056†
+  模型−基线  B7a_bag(无WT)           D∉L_g: B_r +0.026  B_r|TF +0.044†  C_AUCdn -0.009  C_APdn +0.027  C_APup -0.000
+  模型−基线  B7b_bag(+WT)           D∈L_g: B_r -0.123†  B_r|TF -0.168†  C_AUCdn -0.022†  C_APdn -0.011  C_APup +0.013
+  模型−基线  B7b_bag(+WT)           D∉L_g: B_r -0.031  B_r|TF -0.020  C_AUCdn -0.017†  C_APdn +0.009  C_APup -0.031†
+  消融−参照  w/o layout             D∈L_g: B_r -0.256†‡  B_r|TF -0.242†‡  C_AUCdn -0.019†  C_APdn -0.252†‡  C_APup -0.177†‡
+  消融−参照  w/o layout             D∉L_g: B_r -0.312†‡  B_r|TF -0.335†‡  C_AUCdn -0.009  C_APdn -0.154†‡  C_APup -0.087†‡
+  消融−参照  w/o site deletion      D∈L_g: B_r -0.029  B_r|TF -0.032  C_AUCdn -0.007†  C_APdn -0.034†‡§  C_APup -0.045†‡§
+  消融−参照  w/o site deletion      D∉L_g: B_r -0.003  B_r|TF -0.006  C_AUCdn +0.000  C_APdn -0.017†‡  C_APup +0.005
+  消融−参照  w/o cis                D∈L_g: B_r -0.003  B_r|TF +0.016  C_AUCdn -0.001  C_APdn +0.007  C_APup -0.017
+  消融−参照  w/o cis                D∉L_g: B_r +0.003  B_r|TF +0.004  C_AUCdn +0.003  C_APdn +0.004  C_APup +0.011
+
+[5b] Table 6 公平集成对照(26 号 [2d])：模型单 seed / 集成 对 B7 单模型 / bagging 集成；†=按基因整群 bootstrap CI 不含0(只含 test 抽样)；‡=再加训练随机性的合成区间不含0；§=保守区间不含0(‡/§ 要 26 号 v6 才有)
+    取值(seed 间标准差只对单 seed 均值那行)：      B_r|TF   C_APdn   C_APup  C_AUCdn   wTF_dn   wTF_up
+      Ours seed ensemble                  0.592    0.388    0.263    0.911    0.774    0.754
+      Ours single-seed mean               0.554    0.350    0.235    0.893    0.752    0.734
+      B7a GBDT+flat layout                0.548    0.338    0.242    0.918    0.750    0.745
+      B7a-bag GBDT+flat (bagged)          0.558    0.357    0.248    0.921    0.761    0.755
+      B7b GBDT+flat layout+WT             0.642    0.367    0.271    0.926    0.785    0.767
+      B7b-bag GBDT+flat+WT (bagged)       0.650    0.384    0.283    0.928    0.793    0.776
+      B6 GBDT(B5 feats)                   0.534    0.281    0.208    0.911    0.704    0.698
+    (i) Ours ens - B7a-bag    B_r|TF +0.034†  C_APdn +0.031†‡§  C_APup +0.015  C_AUCdn -0.010†‡§  wTF_dn +0.013  wTF_up -0.001
+    (j) Ours single - B7a     B_r|TF +0.006  C_APdn +0.012  C_APup -0.008  C_AUCdn -0.026†‡§  wTF_dn +0.002  wTF_up -0.011
+    Ours ens - B7b-bag        B_r|TF -0.058†‡§  C_APdn +0.004  C_APup -0.019†  C_AUCdn -0.018†‡§  wTF_dn -0.019†‡§  wTF_up -0.023†‡§
+    Ours single - B7b         B_r|TF -0.089†‡§  C_APdn -0.017  C_APup -0.036†‡§  C_AUCdn -0.033†‡§  wTF_dn -0.033†‡§  wTF_up -0.033†‡§
+    (k) B7a bag - single      B_r|TF +0.010  C_APdn +0.019†‡§  C_APup +0.006  C_AUCdn +0.003†‡§  wTF_dn +0.010†‡  wTF_up +0.010†‡
+    Ours ens - single         B_r|TF +0.038†  C_APdn +0.037†  C_APup +0.028†  C_AUCdn +0.018†  wTF_dn +0.021†  wTF_up +0.020†
+    (‡/§ 的区间宽度见 paper_numbers.md 的 Table 6 节；"Ours ens - single"两边共用同一批 seed，不给 ‡/§)
+
+[6] Table S1：v8_headA_all 对 v3_ce_marker_dense(扩大 Head A 训练基因集；第9批 out/results/_compare/pairwise_delta.csv)
+  perhead(k=5): A_r +0.027†  B_r +0.012  B_sign +0.011  B_r|TF +0.015  C_AUCdn +0.001  C_APdn +0.001  C_AUCup +0.002  C_APup +0.003  C_mF1 +0.004
+  selected(k=5): A_r +0.025  B_r +0.019†  B_sign +0.018†‡  B_r|TF +0.025†‡  C_AUCdn +0.000  C_APdn +0.005  C_AUCup -0.002  C_APup -0.001  C_mF1 +0.002
+  Head A 全基因 test: 全部 +0.106†‡  网格 +0.027  网格外 +0.155†‡  网格外有位点 +0.047  网格外无位点 +0.193†‡
+  (k=5 的噪声 rms 是从 k=2 外推的，见 [1] 末尾的比值)
+
+[7] Table S2：位置机制(以 v3_ce_marker_dense 为底；out/results/_compare_pos)
+  w/o position vs v3                        (k=3): A_r -0.046†‡  B_r -0.025†‡  B_r|TF -0.029†‡  C_AUCdn +0.002  C_APdn -0.036†‡  C_APup -0.014†
+  shuffled positions vs v3                  (k=3): A_r -0.019  B_r -0.019†‡  B_r|TF -0.022†‡  C_AUCdn -0.007  C_APdn -0.027†‡  C_APup -0.010
+  global shift vs v3                        (k=3): A_r -0.055†‡  B_r -0.013  B_r|TF -0.017  C_AUCdn +0.000  C_APdn -0.033†‡  C_APup -0.010
+  global shift vs w/o position              (k=3): A_r -0.010  B_r +0.012  B_r|TF +0.012  C_AUCdn -0.002  C_APdn +0.003  C_APup +0.004
+  global shift vs shuffled positions        (k=3): A_r -0.036†‡  B_r +0.007  B_r|TF +0.006  C_AUCdn +0.007  C_APdn -0.006  C_APup +0.000
+  (这张表的模型是 v3 配置，方法里要写明；噪声 rms 用 v8 的零分布外推，只是量级参照)
+
+[8] 自检(不同脚本算的同一个量必须一致；⚠ 的那项先查来源再写论文)
+  (a) 26 号模型行 vs 19 号第9批 [4] v8 perhead：最大差 1.1e-16 ✓
+  (b) 26 号 Head A 模型 test 全部 vs 25 号第9批：差 0.0e+00 ✓
+  (c) w/o layout：19 号 A_r(820 网格) Δ vs 25 号 test 网格 Δ 差 6.7e-06 ✓
+  (c) w/o site deletion：19 号 A_r(820 网格) Δ vs 25 号 test 网格 Δ 差 1.6e-05 ✓
+  (c) w/o cis：19 号 A_r(820 网格) Δ vs 25 号 test 网格 Δ 差 1.3e-06 ✓
+  (c) lambda_A=0.3：19 号 A_r(820 网格) Δ vs 25 号 test 网格 Δ 差 2.3e-06 ✓
+  (d) 25 号逐基因 csv：v8_headA_all 逐 seed 均值 vs _ens 列 最大差 4.4e-16 ✓
+  (e) 26 号 B4 ≥ B2(AUROC dn)：+0.003 ✓
+
+[9] 规则核对(预先写下的规则，用这里的数重判；"明显"=|Δ|≥0.02 且 CI 不含0)
+  成立  (a) 模型对 B4 在 B_r|TF、C_APdn 明显更好：B_r|TF +0.335[+0.287,+0.384]  C_APdn +0.150[+0.122,+0.177]
+  成立  (c) B5/B6/B7 有指标明显强于模型(触发=要在讨论里写)：[('B7b_gbdt+flat(+WT)', 'B_r'), ('B7b_gbdt+flat(+WT)', 'B_r|TF'), ('B7b_bag(+WT)', 'B_r'), ('B7b_bag(+WT)', 'B_r|TF')]
+  不成立  (e) TF 内 AUROC 比 B3~B7(含 bag)最强的高 ≥0.03 且 CI 不含0：dn: 对 B7b_bag(+WT) -0.019[-0.037,-0.005]  up: 对 B7b_bag(+WT) -0.023[-0.044,-0.002]
+  成立  (i)+ 对等集成：模型集成−B7a_bag 在 B_r|TF/C_APdn/wTF_dn 里 ≥2 项明显更好【+ 口径：只含 test 抽样，成立也不据此写有增益，以 (i‡) 和 (m) 为准】：B_r|TF +0.034[+0.003,+0.068]  C_APdn +0.031[+0.012,+0.054]  wTF_dn +0.013[-0.002,+0.029]  明显更好['B_r|TF', 'C_APdn'] 明显更差[]
+  不成立  (j)+ 单对单：模型单seed均值−B7a 在 B_r|TF/C_APdn/wTF_dn 里 ≥2 项明显更好【+ 口径：只含 test 抽样，成立也不据此写有增益，以 (j‡) 和 (m) 为准】：B_r|TF +0.006[-0.027,+0.040]  C_APdn +0.012[-0.010,+0.038]  wTF_dn +0.002[-0.011,+0.018]  明显更好[] 明显更差[]
+  不成立  (k)+ B7a_bag−B7a 在 C_APdn ≥0.02 且 CI>0(集成对 GBDT 也有明显增益，对等性成立)【+ 口径：只含 test 抽样】：C_APdn +0.019[+0.010,+0.030]
+  不成立  (i‡) 对等集成：模型集成−B7a_bag 在 B_r|TF/C_APdn/wTF_dn 里 ≥2 项明显‡(合成区间含训练随机性)：B_r|TF +0.034 合成(-0.000,+0.068) 保守(-0.001,+0.068)  C_APdn +0.031 合成(+0.009,+0.053) 保守(+0.008,+0.054)  wTF_dn +0.013 合成(-0.003,+0.030) 保守(-0.004,+0.031)  明显‡['C_APdn'](其中§也成立['C_APdn'])
+  不成立  (j‡) 单对单：模型单seed均值−B7a 在 B_r|TF/C_APdn/wTF_dn 里 ≥2 项明显‡(合成区间含训练随机性)：B_r|TF +0.006 合成(-0.028,+0.040) 保守(-0.032,+0.044)  C_APdn +0.012 合成(-0.014,+0.037) 保守(-0.015,+0.038)  wTF_dn +0.002 合成(-0.013,+0.018) 保守(-0.015,+0.019)  明显‡[](其中§也成立[])
+  成立  (m) 摘要可以写"对等集成下仍有增益"(Variant A 或 A-lite；按 (i‡)，status 第9节(l))：Variant A-lite：明显‡的项 ['C_APdn'](§ 也成立的 ['C_APdn']；摘要只点这些项的名字和数字)
+  成立  (n) B7 选中的 Head B / Head C 轮数都不顶网格边界(基线调参收敛)：B7a_gbdt+flat(无WT) B=1200(val 0.6200)  B7a_gbdt+flat(无WT) C(none，选中)=150(val 0.2985)  B7b_gbdt+flat(+WT) B=800(val 0.7248)  B7b_gbdt+flat(+WT) C(none，选中)=100(val 0.3239)
+  成立  (l) 堆叠(模型+B7b_bag)−B7b_bag 在 B_r|TF 或 C_APdn 明显>0(模型带来最强基线之外的信息，可写"互补")：B_r|TF +0.029[+0.014,+0.043]  C_APdn +0.039[+0.029,+0.051]
+  成立  (d) Head A 对最强浅层基线 Δ≥0.02(全部基因)：对 A3_layout+token_分块ridge: 全部 +0.082[+0.058,+0.108]  网格外 +0.032[-0.007,+0.073]
+  成立  (f1) STACK(模型+B6_gbdt) − B6_gbdt(同B5特征)：堆叠−基线 明显>0(模型带来基线之外的信息)：B_r|TF +0.111[+0.082,+0.143]  C_APdn +0.120[+0.099,+0.144]
+  成立  (f2) STACK(模型+B6_gbdt) − 模型 v8_headA_all(ens_ph)：堆叠−模型 明显>0(基线特征里有模型缺的信息)：B_r|TF +0.053[+0.026,+0.081]  C_APdn +0.014[+0.005,+0.026]
+  成立  (f1) STACK(模型+B7a_bag) − B7a_bag(无WT)：堆叠−基线 明显>0(模型带来基线之外的信息)：B_r|TF +0.056[+0.036,+0.081]  C_APdn +0.043[+0.031,+0.056]
+  成立  (f2) STACK(模型+B7a_bag) − 模型 v8_headA_all(ens_ph)：堆叠−模型 明显>0(基线特征里有模型缺的信息)：B_r|TF +0.022[+0.010,+0.033]  C_APdn +0.012[+0.002,+0.024]
+  成立  (f1) STACK(模型+B7b_bag) − B7b_bag(+WT)：堆叠−基线 明显>0(模型带来基线之外的信息)：B_r|TF +0.029[+0.014,+0.043]  C_APdn +0.039[+0.029,+0.051]
+  成立  (f2) STACK(模型+B7b_bag) − 模型 v8_headA_all(ens_ph)：堆叠−模型 明显>0(基线特征里有模型缺的信息)：B_r|TF +0.087[+0.055,+0.117]  C_APdn +0.035[+0.022,+0.050]
+  不成立  (g) 模型对 B4 的增量主要在 D∈L_g 层：D∈L_g B_r|TF +0.309 C_APdn +0.147；D∉L_g +0.416 / +0.158
+  成立  [消融] no_layout 降幅 ≥ 第4批的一半，且合成区间不含0：A_r -0.311‡  B_r -0.297‡  B_r|TF -0.321‡  C_APdn -0.195‡
+  成立  [消融] no_knockout：C_APdn 变差超出合成区间("删位点帮 Head C")：C_APdn -0.025†‡(k=5)  C_APup -0.007(k=5)  B_r|TF -0.014(k=5)  A_r -0.020(k=5)  (A_r 是阴性对照：设计上不该动)
+  成立  [消融·第12批] no_knockout 的 C_APdn 在保守合成区间(§，不外推)下也不含0：C_APdn -0.025 合成(-0.041,-0.010) 保守(-0.043,-0.007)  逐seed 0/5 变好  符号检验双侧p=0.062
+  成立  [消融·第12批] no_knockout 过‡的指标里，同时过§且逐seed≥k−1同向的(可写成结论)：稳：C_APdn -0.025(同向 5/5)；不稳(只写"在 test 抽样意义下")：C_mF1 -0.013(同向 3/5，§不成立)
+  不成立  [消融] no_knockout 的 C_APdn 变差只在 D∈L_g(D∉L_g 合成区间含0)：D∈L_g -0.034‡  D∉L_g -0.017‡
+  不成立  [消融] no_cis 有任何一项超出合成区间：A_r -0.012  C_APdn +0.005  C_mF1 -0.000
+  不成立  [消融] λ_A=0.3：B_r|TF 或 C_APdn 明显更好(2/2)且 A_r 降幅 ≤0.03：B_r|TF +0.001  C_APdn -0.015  A_r -0.012
+  成立  [28号] (p1) D∈L_g 层 Δ_infer 的 C_APdn 或 C_APup 明显<0(推理时读删位点对比)：C_APdn -0.133[-0.167,-0.100] 逐seed 0/5 变好  C_APup -0.099[-0.135,-0.069] 逐seed 0/5 变好
+  不成立  [28号] (p2) D∈L_g 层 Δ_infer 的 |C_APdn|、|C_APup| 都<0.01(收益几乎全在训练期)：C_APdn -0.133  C_APup -0.099
+  不成立  [28号] (p3) D∉L_g 层 Δ_train 的 C_APdn<0 且保守合成区间(§)不含0(删位点训练对间接响应也有用)：C_APdn -0.017 合成(-0.033,-0.001) 保守(-0.037,+0.004) 逐seed 0/5 变好
+  不成立  [28号] (p4) D∈L_g 层 Δ_zero 的 C_APdn、C_APup 都在 ±0.01 内(删 token 本身无害)：C_APdn -0.199†  C_APup -0.156†
+  成立  [28号] (p5) Spearman(ε_C, role_test)>0 且 TF bootstrap CI 不含0(删位点效应带着 TF 方向)：W +0.850[+0.672,+0.917](33 个 TF)；N 对照 +0.517
+  成立  [28号] (p6) e_C 的 TF 内合并 AUROC(down vs up)>0.5 且 CI 不含0.5(基因特异的方向信息)：W 0.665[0.607,0.718]；合并 0.790；N 对照 TF 内 0.453
+  成立  [28号] 自检 (s1)：v8_headA_all seed42 原生格 W_del vs 17 号导出 最大差 0.00e+00(共 10 项)
+  成立  [28号] 自检 (s2)：v8_headA_all seed42 D∉L_g 行 del vs nodel 最大差 0.00e+00(共 10 项)
+  成立  [28号] 自检 (s3)：Δ_total vs 19 号 out/results/_compare_b11：21 项，最大差 9.7e-17
+  成立  [28号] 自检 (s4)：自算 D∈L_g vs 17 号导出 D_in_Lg：不一致 0 行
+  成立  [29号] (q1) Δ_spec 的 C_APdn 和 C_APup 都明显 <0(删错比删对差 -> 删位点效应是 D 特异的)：C_APdn -0.208[-0.244,-0.170](0/5 变好)  C_APup -0.129[-0.171,-0.093](0/5 变好)
+  成立  [29号] (q2) Δ_wn 的 C_APdn、C_APup 都不明显 >0(删错相对不删没有通用收益)：C_APdn -0.074[-0.097,-0.052](0/5 变好)  C_APup -0.030[-0.045,-0.017](0/5 变好)
+  成立  [29号] (q3) 错配删除的 ε_C 跟被删 TF 自己的 role 的 Spearman >0 且 TF bootstrap CI 不含0：错配 +0.792[+0.664,+0.874](67 个 TF)；真删 +0.798
+  成立  [29号] (q4) e_C 的 TF 内合并 AUROC：真删 − 错配删 ≥0.05 且配对 bootstrap CI 不含0：真删 0.665  错配 0.473  差 +0.192[+0.104,+0.282]
+  成立  [29号] 自检 (s1)：v8_headA_all seed42 W_del vs 17 号导出 最大差 0.00e+00(共 5 项)
+  成立  [29号] 自检 (s2)：v8_headA_all seed42 不可配对行 W_wrong vs W_del 最大差 0.00e+00(共 5 项)
+  成立  [29号] 自检 (s5)：包装类抽样核对 2000 行：layout_d 没有 D'、保留 D、少掉的位点数=D' 的位点数；不一致 0 行
+
+[9b] 短文(ICBCB/ICBBT 4~5 页)专用：tables_short.tex/.docx/.txt(两张紧凑表) + abstract_draft.md(按 (m) 选版本、自动填数)
+  Table 1. Main comparison on held-out chromosomes (101,680 gene-TF pairs, 820 genes, 3,976 significant). Top: absolute values (bold: best among baselines and our ensemble). Bottom: differences; † bootstrap 95% CI excludes 0; ‡ the interval that also includes re-training variability excludes 0.
+                                                         r_B|TF     AUROC_dn     AUPRC_dn     AUPRC_up wTF-AUROC_dn
+      B4 pair + TF prior                                  0.257        0.899        0.237        0.159        0.589
+      B6 GBDT + WT expr.                                  0.534        0.911        0.281        0.208        0.704
+      B7a GBDT + flat layout                              0.548        0.918        0.338        0.242        0.750
+      B7a-bag (bagged)                                    0.558        0.921        0.357        0.248        0.761
+      B7b-bag (+ WT expr.)                                0.650        0.928        0.384        0.283        0.793
+      ------------------------------------------------------------
+      Ours, 1 seed (mean ± sd)                      0.554±0.008  0.893±0.005  0.350±0.009  0.235±0.009  0.752±0.006
+      Ours, 5-seed ens.                                   0.592        0.911        0.388        0.263        0.774
+      Ours + B7b-bag (stack)                              0.678        0.932        0.423        0.298           --
+      ------------------------------------------------------------
+      Ours ens. - B7a-bag                               +0.034†     -0.010†‡     +0.031†‡       +0.015       +0.013
+      Ours 1 seed (mean) - B7a                           +0.006     -0.026†‡       +0.012       -0.008       +0.002
+  
+  Table 2. Mechanism: component ablations (Δ = ablation − reference) and a deletion-specificity control at inference. Reference rows: the full model trained with the same seeds, absolute values on all test pairs (k = number of seeds). † bootstrap 95% CI excludes 0; ‡ the interval that also includes re-training variability excludes 0; § (k>2) also excludes 0 without extrapolating the 2-seed variability to k seeds.
+                                                       d r_B|TF   d AUPRC_dn   d AUPRC_up
+      Reference (k=2 seeds)                               0.580        0.372        0.243
+      w/o layout (k=2)                                 -0.321†‡     -0.195†‡     -0.110†‡
+      w/o cis (k=2)                                      +0.004       +0.005       +0.004
+      ------------------------------------------------------------
+      Reference (k=5 seeds)                               0.592        0.388        0.263
+      w/o site deletion (k=5)                            -0.014    -0.025†‡§       -0.007
+         only D in L_g pairs (k=5)                       -0.032    -0.034†‡§    -0.045†‡§
+      ------------------------------------------------------------
+      Wrong - correct TF deleted (inference)            -0.048†      -0.208†      -0.129†
+  
+  写出 tables_short.tex、tables_short.txt、tables_short.docx(Word 版，粘进会议模板)
+  摘要版本 (m) = Variant A-lite；187 词；flags 0 条
+  并入 28 号 out/results/_siamese_probe/paper_numbers_probe.md
+  并入 28 号 out/results/_siamese_probe/tables_probe.tex
+  并入 29 号 out/results/_spec_control/paper_numbers_spec.md
+  并入 29 号 out/results/_spec_control/tables_spec.tex
+
+写出 out/results/_paper/：summary.txt、paper_numbers.md、tables.tex、table1_main.csv、table2_head_bc.csv、table3_head_a.csv、table4_ablation_long.csv、table5_strata_long.csv、tableS1_v8_vs_v3.csv、tableS2_position.csv、null_seed_variability.csv、rule_checks.csv、tables_short.tex/.docx/.txt、abstract_draft.md、fig/*.png(28/29 号的表/数字/规则已并入，如有)  (用时 1.0 分钟)

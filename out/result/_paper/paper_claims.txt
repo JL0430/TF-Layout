@@ -1,0 +1,122 @@
+# paper_claims.txt —— 关键论断表(第16批e)。每行：id ;; 稿子里的锚点正则 ;; 数(空格分隔，按稿子写法、不带符号) ;; 来源行正则
+# 检查：锚点后 400 字符内(表格：同一行)有这些数；来源里有一行同时含该数并匹配来源行正则。来源 = out/results/_paper/ 里的 summary.txt、abstract_draft.md、tables_short.txt 等。
+# 稿子改写后锚点对不上会报 WARN，到这里改锚点；数改了对不上来源会报 ERROR。
+# ---- 摘要
+A01 ;; precision-recall curve \(AUPRC\) of ;; 0.388 ;; perhead\s+C_APdn\s+0\.388
+A02 ;; precision-recall curve \(AUPRC\) of ;; 0.263 ;; perhead\s+C_APup\s+0\.263
+A03 ;; within-TF area under the ROC curve of ;; 0.774 ;; wTF_pooled_dn\s+0\.774
+A04 ;; within-TF area under the ROC curve of ;; 0.754 ;; wTF_pooled_up\s+0\.754
+A05 ;; modest advantage of ;; 0.031 ;; \(i\) Ours ens - B7a-bag.*C_APdn \+0\.031
+A06 ;; improves down- and up-regulation AUPRC by ;; 0.034 ;; w/o site deletion\s+D∈L_g.*C_APdn -0\.034
+A07 ;; improves down- and up-regulation AUPRC by ;; 0.045 ;; w/o site deletion\s+D∈L_g.*C_APup -0\.045
+A08 ;; at inference instead lowers ;; 0.208 ;; \(q1\).*C_APdn -0\.208
+A09 ;; at inference instead lowers ;; 0.129 ;; \(q1\).*C_APup -0\.129
+A10 ;; stacking the two raises AUPRC by ;; 0.039 ;; \(l\) 堆叠.*C_APdn \+0\.039
+A11 ;; stacking the two raises AUPRC by ;; 0.015 ;; table5_stack.*C_APup
+# ---- 数据与任务
+D01 ;; reaches a down-regulation area under the ROC curve \(AUROC\) of ;; 0.891 ;; B1 TF mean
+# ---- 5.1 对平铺特征
+E01 ;; Against B4 ;; 0.335 ;; \(a\) 模型对 B4.*B_r\|TF \+0\.335
+E02 ;; Against B4 ;; 0.150 ;; \(a\) 模型对 B4.*C_APdn \+0\.150
+E03 ;; single-seed models differs from B7a by ;; 0.006 ;; \(j\)\+ 单对单.*B_r\|TF \+0\.006
+E04 ;; single-seed models differs from B7a by ;; 0.012 ;; \(j\)\+ 单对单.*C_APdn \+0\.012
+E05 ;; single-seed models differs from B7a by ;; 0.002 ;; \(j\)\+ 单对单.*wTF_dn \+0\.002
+E06 ;; single-seed models differs from B7a by ;; 0.026 ;; \(j\) Ours single - B7a.*C_AUCdn -0\.026
+E07 ;; helps the neural model more than bagging ;; 0.037 ;; Ours ens - single.*C_APdn \+0\.037
+E08 ;; helps the neural model more than bagging ;; 0.019 ;; \(k\) B7a bag - single.*C_APdn \+0\.019
+E09 ;; ensembling, our ensemble exceeds B7a-bag by ;; 0.031 ;; \(i\) Ours ens - B7a-bag.*C_APdn \+0\.031
+E10 ;; The difference in ;; 0.034 ;; \(i\) Ours ens - B7a-bag.*B_r\|TF \+0\.034
+E11 ;; The difference in ;; 0.013 ;; \(i\) Ours ens - B7a-bag.*wTF_dn \+0\.013
+E12 ;; The difference in ;; 0.010 ;; \(i\) Ours ens - B7a-bag.*C_AUCdn -0\.010
+E13 ;; B7b-bag exceeds our ensemble ;; 0.650 ;; B7b-bag GBDT\+flat\+WT \(bagged\)\s+0\.650
+E14 ;; B7b-bag exceeds our ensemble ;; 0.592 ;; Ours seed ensemble\s+0\.592
+E15 ;; B7b-bag exceeds our ensemble ;; 0.793 0.776 0.384 ;; B7b-bag GBDT\+flat\+WT \(bagged\)\s+0\.650
+E16 ;; B7b-bag exceeds our ensemble ;; 0.774 ;; wTF_pooled_dn\s+0\.774
+E17 ;; B7b-bag exceeds our ensemble ;; 0.754 ;; wTF_pooled_up\s+0\.754
+E18 ;; B7b-bag exceeds our ensemble ;; 0.388 ;; perhead\s+C_APdn\s+0\.388
+E19 ;; stacking the two raises rB\|TF ;; 0.029 ;; \(l\) 堆叠.*B_r\|TF \+0\.029
+E20 ;; stacking the two raises rB\|TF ;; 0.039 ;; \(l\) 堆叠.*C_APdn \+0\.039
+E21 ;; stacking the two raises rB\|TF ;; 0.015 ;; table5_stack.*C_APup
+E22 ;; ensemble without expression input reaches a correlation of ;; 0.728 ;; perhead\s+A_r:全部\s+0\.728
+E23 ;; ensemble without expression input reaches a correlation of ;; 0.563 ;; A_r:组内中心化\s+0\.563
+E24 ;; ensemble without expression input reaches a correlation of ;; 0.646 0.396 ;; A3 layout\+token\s+0\.646
+# ---- 5.2 机制
+M01 ;; Without the contrast, down-regulation AUPRC falls by ;; 0.025 ;; C_APdn\s+Δ=-0\.0254
+M02 ;; Without the contrast, down-regulation AUPRC falls by ;; 0.034 ;; w/o site deletion\s+D∈L_g.*C_APdn -0\.034
+M03 ;; Without the contrast, down-regulation AUPRC falls by ;; 0.045 ;; w/o site deletion\s+D∈L_g.*C_APup -0\.045
+M04 ;; lowers down- and up-regulation AUPRC by ;; 0.208 ;; \(q1\).*C_APdn -0\.208
+M05 ;; lowers down- and up-regulation AUPRC by ;; 0.129 ;; \(q1\).*C_APup -0\.129
+M06 ;; lowers down- and up-regulation AUPRC by ;; 0.665 ;; \(q4\).*真删 0\.665
+M07 ;; lowers down- and up-regulation AUPRC by ;; 0.473 ;; \(q4\).*错配 0\.473
+M08 ;; a model trained without deletion loses ;; 0.199 ;; \(p4\).*C_APdn -0\.199
+M09 ;; Spearman ;; 0.80 ;; \(q3\).*真删 \+0\.798
+M10 ;; Spearman ;; 0.79 ;; \(q3\).*错配 \+0\.792
+M11 ;; removing positions lowered down-regulation AUPRC ;; 0.036 ;; w/o position vs v3.*C_APdn -0\.036
+M12 ;; removing positions lowered down-regulation AUPRC ;; 0.027 ;; shuffled positions vs v3.*C_APdn -0\.027
+M13 ;; removing positions lowered down-regulation AUPRC ;; 0.033 ;; global shift vs v3\s+\(k=3\).*C_APdn -0\.033
+M14 ;; removing positions lowered down-regulation AUPRC ;; 0.003 ;; global shift vs w/o position.*C_APdn \+0\.003
+# ---- 讨论与局限
+L01 ;; The gap between our ensemble and a single ;; 0.338 ;; B7a GBDT\+flat layout\s+0\.548\s+0\.338
+L02 ;; The gap between our ensemble and a single ;; 0.012 ;; \(j\)\+ 单对单.*C_APdn \+0\.012
+L03 ;; \(median 0\.57\) ;; 0.57 0.71 ;; rms_2/rms_1 实测中位 0\.57
+# ---- 表一(数字都是 summary.txt [9b] 与 [5b] 的原行)
+T1a ;; ^B4 pair \+ TF prior ;; 0.257 0.899 0.237 0.159 0.589 ;; B4 pair \+ TF prior\s+0\.257
+T1b ;; ^B6 GBDT \+ WT expr\. ;; 0.534 0.911 0.281 0.208 0.704 ;; B6 GBDT \+ WT expr\.\s+0\.534
+T1c ;; ^B7a GBDT \+ flat layout ;; 0.548 0.918 0.338 0.242 0.750 ;; B7a GBDT \+ flat layout\s+0\.548
+T1d ;; ^B7a-bag ;; 0.558 0.921 0.357 0.248 0.761 ;; B7a-bag \(bagged\)\s+0\.558
+T1e ;; ^B7b-bag \(\+ WT expr\.\) ;; 0.650 0.928 0.384 0.283 0.793 ;; B7b-bag \(\+ WT expr\.\)\s+0\.650
+T1f ;; ^Ours, 1 seed \(mean\) ;; 0.554 0.893 0.350 0.235 0.752 ;; Ours, 1 seed \(mean ± sd\)\s+0\.554
+T1g ;; sd over 5 seeds ;; 0.008 0.005 0.009 0.009 0.006 ;; Ours, 1 seed \(mean ± sd\)\s+0\.554
+T1h ;; ^Ours, 5-seed ens\. ;; 0.592 0.911 0.388 0.263 0.774 ;; Ours, 5-seed ens\.\s+0\.592
+T1i ;; ^Ours \+ B7b-bag \(stack\) ;; 0.678 0.932 0.423 0.298 ;; Ours \+ B7b-bag \(stack\)\s+0\.678
+T1j ;; ^Ours ens\. \S+ B7a-bag ;; 0.034 0.010 0.031 0.015 0.013 ;; Ours ens\. - B7a-bag\s+\+0\.034
+T1k ;; ^Ours 1 seed \S+ B7a ;; 0.006 0.026 0.012 0.008 0.002 ;; Ours 1 seed \(mean\) - B7a\s+\+0\.006
+T1l ;; ^Ours ens\. \S+ B7b-bag ;; 0.058 0.018 0.004 0.019 0.019 ;; Ours ens - B7b-bag\s+B_r\|TF -0\.058
+# ---- 表二
+T2a ;; ^Reference, k = 2 seeds ;; 0.580 0.372 0.243 ;; Reference \(k=2 seeds\)\s+0\.580
+T2b ;; ^w/o layout \(k = 2\) ;; 0.321 0.195 0.110 ;; w/o layout \(k=2\)\s+-0\.321
+T2c ;; ^w/o cis \(k = 2\) ;; 0.004 0.005 0.004 ;; w/o cis \(k=2\)\s+\+0\.004
+T2d ;; ^Reference, k = 5 seeds ;; 0.592 0.388 0.263 ;; Reference \(k=5 seeds\)\s+0\.592
+T2e ;; ^w/o site deletion \(k = 5\) ;; 0.014 0.025 0.007 ;; w/o site deletion \(k=5\)\s+-0\.014
+T2f ;; only pairs with ;; 0.032 0.034 0.045 ;; only D in L_g pairs \(k=5\)\s+-0\.032
+T2g ;; ^Wrong \S+ correct TF deleted ;; 0.048 0.208 0.129 ;; Wrong - correct TF deleted \(inference\)\s+-0\.048
+# ---- 方法与超参(第16批h：对照 28 号 hyperparams / tables.tex 的 hparams 表；稿子 IV-B 的训练句)
+H01 ;; optimize with AdamW ;; 0.0001 ;; Learning rate
+H02 ;; optimize with AdamW ;; 0.05 ;; weight decay
+H03 ;; optimize with AdamW ;; 0.2 ;; Dropout
+H04 ;; optimize with AdamW ;; 192 ;; Batch size
+# ---- 第20批(v6 稿)新增、第22批(v8 稿)收紧：+WT 模型(v11_wt_bc)与 IV-D。数字来源 = out/results/_paper/data_facts_v11.txt(状态文件 3.10)。
+# 第22批起来源行正则不再用 "."：每个数绑定 data_facts_v11.txt 里带指标名的那一行(行格式：说明：数字  [出处]；负号 U+2212、冒号为全角)。
+# 例外：N21 的来源仍是 paper_numbers.md(v8 的 0.031)。T1m/T1n 要求 data_facts_v11.txt 末尾的两行"整行"(第22批新增，由上面各行按表一列序合并)。
+# ---- IV-D 重训噪声(v11 两 seed rms：B_r|TF .0173、C_APdn .0142；v8 同口径 .0067/.0064)
+N01 ;; more than twice as large in ;; 0.017 ;; 重训 rms：r_B\|TF 0\.017
+N02 ;; more than twice as large in ;; 0.007 ;; 重训 rms：r_B\|TF 0\.017.*v8 同项 0\.0067，即 0\.007
+N22 ;; more than twice as large in ;; 0.014 0.006 ;; 重训 rms：AUPRC down 0\.014.*v8 同项 0\.0064，即 0\.006
+# ---- IV-A +WT 新增参数
+N23 ;; two small added networks \( ;; 0.5 ;; 新增参数：0\.5 million
+# ---- 表一 +WT 两行(逐格；表格：同一行)
+N03 ;; ^Ours \+ WT, 5-seed ens\. ;; 0.661 ;; 5-seed 集成 r_B\|TF：0\.661
+N04 ;; ^Ours \+ WT, 5-seed ens\. ;; 0.925 ;; 5-seed 集成 global AUROC down：0\.925
+N05 ;; ^Ours \+ WT, 5-seed ens\. ;; 0.426 ;; 5-seed 集成 AUPRC down：0\.426
+N06 ;; ^Ours \+ WT, 5-seed ens\. ;; 0.287 ;; 5-seed 集成 AUPRC up：0\.287
+N07 ;; ^Ours \+ WT, 5-seed ens\. ;; 0.813 ;; 5-seed 集成 pooled within-TF AUROC down：0\.813
+N08 ;; ^Ours \+ WT \S+ B7b-bag ;; 0.011 ;; r_B\|TF 差值：\+0\.011
+N09 ;; ^Ours \+ WT \S+ B7b-bag ;; 0.003 ;; global AUROC down 差值：−0\.003
+N10 ;; ^Ours \+ WT \S+ B7b-bag ;; 0.042 ;; AUPRC down 差值：\+0\.042
+N11 ;; ^Ours \+ WT \S+ B7b-bag ;; 0.004 ;; AUPRC up 差值：\+0\.004
+N12 ;; ^Ours \+ WT \S+ B7b-bag ;; 0.020 ;; within-TF AUROC down 差值：\+0\.020
+# ---- 表一 +WT 两行的整行版(抓"同一行/列错位"：五个数必须同在 data_facts_v11.txt 末尾的同一行；该行是第22批由上面各行合并出的)
+T1m ;; ^Ours \+ WT, 5-seed ens\. ;; 0.661 0.925 0.426 0.287 0.813 ;; 表一 Ours \+ WT 5-seed 集成整行.*0\.661 0\.925 0\.426 0\.287 0\.813
+T1n ;; ^Ours \+ WT \S+ B7b-bag ;; 0.011 0.003 0.042 0.004 0.020 ;; 表一 Ours \+ WT − B7b-bag 整行.*\+0\.011 −0\.003 \+0\.042 \+0\.004 \+0\.020
+# ---- V.A "With the same measurement as input" 段
+N13 ;; Four are indistinguishable ;; 0.776 ;; B7b-bag pooled within-TF AUROC up：0\.776
+N24 ;; Four are indistinguishable ;; 0.776 ;; 5-seed 集成 pooled within-TF AUROC up：0\.776
+N14 ;; two favor the \+WT model ;; 0.042 ;; AUPRC down 差值：\+0\.042
+N15 ;; two favor the \+WT model ;; 0.020 ;; within-TF AUROC down 差值：\+0\.020
+N16 ;; stay below the single B7b in ;; 0.015 ;; 单 seed 均值 − B7b：global AUROC down −0\.015
+N17 ;; stay below the single B7b in ;; 0.019 ;; 单 seed 均值 − B7b：AUPRC up −0\.019
+N18 ;; still adds AUPRC ;; 0.054 ;; 堆叠\(\+WT 模型 \+ B7b-bag\) − B7b-bag：AUPRC down \+0\.054
+N19 ;; still adds AUPRC ;; 0.020 ;; 堆叠\(\+WT 模型 \+ B7b-bag\) − B7b-bag：AUPRC up \+0\.020
+# ---- Discussion 末句(0.042 与 0.031 同在 data_facts_v11.txt 的一行；N21 另用 v8 来源行核 0.031)
+N20 ;; appears with and without it ;; 0.042 0.031 ;; down 方向 AUPRC 的优势：对 B7a-bag \+0\.031.*对 B7b-bag \+0\.042
+N21 ;; appears with and without it ;; 0.031 ;; \(i\) Ours ens - B7a-bag.*C_APdn \+0\.031

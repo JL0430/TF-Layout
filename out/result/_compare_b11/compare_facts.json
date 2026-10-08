@@ -1,0 +1,1 @@
+{"seeds": [42, 123, 456, 789, 2024], "references": ["v8_headA_all"], "runs": ["v8_headA_all", "v10_abl_no_knockout"], "stack": true, "dense_target": "out/head_b_dense_target.parquet", "match_variant": true, "pairwise": [], "strata": true}

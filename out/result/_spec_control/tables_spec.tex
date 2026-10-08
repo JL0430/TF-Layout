@@ -1,0 +1,20 @@
+% 29_deletion_specificity.py 自动生成；需要 \usepackage{booktabs,graphicx,amssymb}
+
+\begin{table}[t]
+\centering
+\caption{Specificity control for explicit site deletion at inference (5-seed ensemble, test set, 14009 pairs where the depleted TF has sites in the promoter and at least one other TF is present). Wrong-TF deletion removes all sites of another TF present in the promoter (chosen to match the depleted TF's site count) while keeping the depleted TF's own sites; the input format is identical to training.}
+\label{tab:spec}
+\setlength{\tabcolsep}{3pt}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lccccc}
+\toprule
+Comparison & AUPRC$_\downarrow$ & AUPRC$_\uparrow$ & AUROC$_\downarrow$ & AUROC$_\uparrow$ & $r_B$ within TF \\
+\midrule
+Correct deletion (reference) & 0.553 & 0.327 & 0.919 & 0.890 & 0.485 \\
+$\Delta$ wrong-TF deletion $-$ correct deletion & $-0.208^{\dagger}$ & $-0.129^{\dagger}$ & $-0.034^{\dagger}$ & $-0.052^{\dagger}$ & $-0.048^{\dagger}$ \\
+$\Delta$ wrong-TF deletion $-$ no deletion & $-0.074^{\dagger}$ & $-0.030^{\dagger}$ & $-0.008^{\dagger}$ & $-0.012^{\dagger}$ & $+0.000$ \\
+$\Delta$ no deletion $-$ correct deletion & $-0.133^{\dagger}$ & $-0.099^{\dagger}$ & $-0.026^{\dagger}$ & $-0.039^{\dagger}$ & $-0.049^{\dagger}$ \\
+\bottomrule
+\end{tabular}}
+\par\smallskip\parbox{0.97\linewidth}{\scriptsize $\dagger$: 95\% gene-cluster bootstrap CI excludes 0. All three rows use the same trained weights, so no training variability is involved.}
+\end{table}

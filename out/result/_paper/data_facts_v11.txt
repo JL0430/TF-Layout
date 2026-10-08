@@ -1,0 +1,40 @@
+# data_facts_v11.txt —— 第19批：+WT 模型 v11_wt_bc 的论文数字(5-seed 集成，各头最优权重 perhead，test 染色体)
+# 放进 out/results/_paper/ 作为 30 号检查器 [2] 的数字来源(每行：说明：数字  [出处])
+# 出处缩写：B11 = out/results/_baselines_v11/summary.txt；V11 = out/results/v11_wt_bc/summary.txt
+
+# ---- 表一新增行：Ours + WT, 5-seed ens.(绝对值) ----
++WT 模型 5-seed 集成 r_B|TF：0.661  [B11 [2d] 模型 5-seed 集成行 B_r|TF]
++WT 模型 5-seed 集成 global AUROC down：0.925  [B11 [2d] C_AUCdn]
++WT 模型 5-seed 集成 AUPRC down：0.426  [B11 [2d] C_APdn]
++WT 模型 5-seed 集成 AUPRC up：0.287  [B11 [2d] C_APup]
++WT 模型 5-seed 集成 pooled within-TF AUROC down：0.813  [B11 [2d] wTF_dn；[2b] 合并 dn 0.813]
++WT 模型 5-seed 集成 pooled within-TF AUROC up：0.776  [B11 [2d] wTF_up；[2b] 合并 up 0.776]
+B7b-bag pooled within-TF AUROC up：0.776  [B11 [2d] B7b_bag wTF_up；[2b]]
+
+# ---- 表一新增行：Ours + WT − B7b-bag(差值；† = 95% 整群 bootstrap 区间不含 0；‡ = 含重训随机性的区间不含 0) ----
+r_B|TF 差值：+0.011  [B11 [2d] 集成−B7b_bag，区间 -0.027..+0.049，无标记]
+global AUROC down 差值：−0.003  [B11 [2d] 集成−B7b_bag，区间 -0.010..+0.003，无标记]
+AUPRC down 差值：+0.042  [B11 [2d] 集成−B7b_bag，区间 +0.019..+0.066，†‡§]
+AUPRC up 差值：+0.004  [B11 [2d] 集成−B7b_bag，区间 -0.013..+0.022，无标记]
+within-TF AUROC down 差值：+0.020  [B11 [2d] 集成−B7b_bag，区间 +0.007..+0.034，†‡§]
+within-TF AUROC up 差值：0.000  [B11 [2d] 集成−B7b_bag wTF_up -0.000，区间 -0.019..+0.018，无标记]
+
+# ---- V.A 新增段：单 seed 均值 − 单个 B7b；堆叠 ----
+单 seed 均值 − B7b：global AUROC down −0.015  [B11 [2d] 单seed均值−B7b，区间 -0.021..-0.008，†‡§]
+单 seed 均值 − B7b：AUPRC up −0.019  [B11 [2d] 单seed均值−B7b，区间 -0.036..-0.001，†‡]
+堆叠(+WT 模型 + B7b-bag) − B7b-bag：AUPRC down +0.054  [B11 [3] 第三块，†]
+堆叠(+WT 模型 + B7b-bag) − B7b-bag：AUPRC up +0.020  [B11 [3] 第三块，†]
+
+# ---- IV-A / IV-D / Discussion ----
++WT 模型新增参数：0.5 million  [V11 [1] 参数量 10,442,144 − v8 9,935,516 = 506,628]
++WT 模型两个 seed 的重训 rms：r_B|TF 0.017(0.0173)  [B11 [2d] 零分布 模型 k2；v8 同项 0.0067，即 0.007]
++WT 模型两个 seed 的重训 rms：AUPRC down 0.014(0.0142)  [B11 [2d] 零分布 模型 k2；v8 同项 0.0064，即 0.006]
+对等集成下 down 方向 AUPRC 的优势：对 B7a-bag +0.031(frozen v8 结果，见 paper_numbers.md)；对 B7b-bag +0.042(+WT 模型，B11 [2d])  -> Discussion "0.042 and 0.031"
+
+# ---- 备查(没写进 v5 正文)：+WT 模型单 seed 均值与集成 ----
+单 seed 均值：r_B|TF 0.623，global AUROC down 0.911，AUPRC down/up 0.386/0.252，wTF dn/up 0.791/0.752  [B11 [2d] 模型 单seed均值(n=5)]
+seed 间标准差：r_B|TF 0.019，AUPRC down 0.013  [B11 [2d] (seed 间标准差)]
+
+# ---- 第22批新增：表一 +WT 两行的整行(由上面各行按表一列序 r_B|TF、AUROC dn、AUPRC dn、AUPRC up、wTF dn 合并；只供 paper_claims.txt 的 T1m/T1n 核"同一行"，不含新数字)
+表一 Ours + WT 5-seed 集成整行(r_B|TF, AUROC dn, AUPRC dn, AUPRC up, wTF dn)：0.661 0.925 0.426 0.287 0.813  [由上面五行合并；出处 B11 [2d]]
+表一 Ours + WT − B7b-bag 整行(r_B|TF, AUROC dn, AUPRC dn, AUPRC up, wTF dn)：+0.011 −0.003 +0.042 +0.004 +0.020  [由上面各差值行合并；出处 B11 [2d]；†‡§ 标记见上面各行]

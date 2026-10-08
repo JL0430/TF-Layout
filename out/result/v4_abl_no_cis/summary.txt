@@ -1,0 +1,135 @@
+==============================================================================
+TF-Layout 训练结果导出【v4_abl_no_cis】  (2026-09-27 07:29:50)  checkpoint 目录: out/checkpoints/v4_abl_no_cis
+设备: cuda  PyTorch 2.5.1+cu121  当前16号代码版本: 2026-09-26a
+==============================================================================
+
+[1] 读到 5 个checkpoint：
+  seed42: 151.8MB  参数量9,935,516  版本2026-09-26a  最优epoch=8/共跑12个epoch(验证48次)  (d=256,heads=8,cis=6,lay=4,bs=192,lr=0.0001,K=4,bf16)  [第2批] ctx=marker headC=delta_tf 选模型=composite val_every=0.25 loss_b=huber adamw dropout=0.2 选中@epoch8.4998 各头最优权重=有 focalγ=0.0 λ_Bd=1.0
+  seed123: 151.8MB  参数量9,935,516  版本2026-09-26a  最优epoch=8/共跑14个epoch(验证56次)  (d=256,heads=8,cis=6,lay=4,bs=192,lr=0.0001,K=4,bf16)  [第2批] ctx=marker headC=delta_tf 选模型=composite val_every=0.25 loss_b=huber adamw dropout=0.2 选中@epoch9.0 各头最优权重=有 focalγ=0.0 λ_Bd=1.0
+  seed456: 151.8MB  参数量9,935,516  版本2026-09-26a  最优epoch=10/共跑14个epoch(验证56次)  (d=256,heads=8,cis=6,lay=4,bs=192,lr=0.0001,K=4,bf16)  [第2批] ctx=marker headC=delta_tf 选模型=composite val_every=0.25 loss_b=huber adamw dropout=0.2 选中@epoch10.2499 各头最优权重=有 focalγ=0.0 λ_Bd=1.0
+  seed789: 151.8MB  参数量9,935,516  版本2026-09-26a  最优epoch=10/共跑14个epoch(验证54次)  (d=256,heads=8,cis=6,lay=4,bs=192,lr=0.0001,K=4,bf16)  [第2批] ctx=marker headC=delta_tf 选模型=composite val_every=0.25 loss_b=huber adamw dropout=0.2 选中@epoch10.4998 各头最优权重=有 focalγ=0.0 λ_Bd=1.0
+  seed2024: 151.9MB  参数量9,935,516  版本2026-09-26a  最优epoch=11/共跑15个epoch(验证60次)  (d=256,heads=8,cis=6,lay=4,bs=192,lr=0.0001,K=4,bf16)  [第2批] ctx=marker headC=delta_tf 选模型=composite val_every=0.25 loss_b=huber adamw dropout=0.2 选中@epoch12.0 各头最优权重=有 focalγ=0.0 λ_Bd=1.0
+
+[2] 构建 Dataset(跟训练时同一套09号代码/同一批文件)
+  条件编码 ctx_mode=marker(ctx_clip=3.0)
+  输入消融 ablation=no_cis(每个 seed 推理前按 checkpoint 记录的值切换；基线/诊断不受影响)
+  样本 585900，TF词表 178，类别计数(down/ns/up) [12410, 563334, 10156]
+  train: 399528条/3222个基因(每基因124~124条)  down/ns/up=8510/383991/7027  显著(y_b非NaN)=15537  ns占比=0.9611(=永远猜ns的accuracy；此时macro-F1=0.3267)  显著log2FC标准差=1.023
+  val  : 84692条/683个基因(每基因124~124条)  down/ns/up=1777/81639/1276  显著(y_b非NaN)=3053  ns占比=0.9640(=永远猜ns的accuracy；此时macro-F1=0.3272)  显著log2FC标准差=1.058
+  test : 101680条/820个基因(每基因124~124条)  down/ns/up=2123/97704/1853  显著(y_b非NaN)=3976  ns占比=0.9609(=永远猜ns的accuracy；此时macro-F1=0.3267)  显著log2FC标准差=1.014
+  稠密 log2FC(评估用)：out/head_b_dense_target.parquet -> 581175/585900 条样本有值(99.2%；不显著样本里 99.2%)
+  Head A 标签文件里有 6572 个基因，进入训练/评估的只有 4725 个(=Head B/C 标签里的基因；其余基因只有Head A标签，目前没被用上)
+
+[3] 条件编码诊断(ctx_wt/ctx_d，见docstring第3条)
+  ctx_wt 参考向量: 全0=False  非零个数=178
+  数据里被耗竭过的TF 124 个，其中 ctx_d 跟 ctx_wt 完全相同(耗竭没让任何TF基因显著变化)的有 0 个
+  all  : D∈L_g 12.64%；条件不可见(WT/D输入完全相同) 0.00%；在down/up样本里占 0.00%(0/22566)
+  train: D∈L_g 12.25%；条件不可见(WT/D输入完全相同) 0.00%；在down/up样本里占 0.00%(0/15537)
+  val  : D∈L_g 13.10%；条件不可见(WT/D输入完全相同) 0.00%；在down/up样本里占 0.00%(0/3053)
+  test : D∈L_g 13.80%；条件不可见(WT/D输入完全相同) 0.00%；在down/up样本里占 0.00%(0/3976)
+  → 条件不可见的样本上 Head C 只能输出同一个常数 logits=ψ_C(0)，Head B 只剩 ψ_corr(D,z_wt)；占比越大，越需要改 ctx 编码(status 第8节)
+
+[4] 基线(只用训练集拟合，见docstring第4条)
+  Head A layout计数回归：3222 个训练基因拟合，特征=['n_sites', 'n_unique_tf', 'sum_a', 'mean_a', 'sum_m', 'mean_m', 'frac_motif_anchored']
+  Head B TF均值：119 个TF(训练显著样本数中位 42)，全局均值 -0.037
+
+[5] 逐seed重新推理(val+test)
+  seed42: 完成(48秒)
+  seed123: 完成(47秒)
+  seed456: 完成(47秒)
+  seed789: 完成(48秒)
+  seed2024: 完成(48秒)
+  复现核对(重新推理 vs checkpoint里存的test指标+最优epoch的val_loss)：最大绝对差 8.79e-08  ✓
+
+[6] 5-seed集成 + Head C logit偏置(val上搜、原样套到test)
+  val上最优偏置: down +0.75, up +1.25  → val macro-F1 0.5600
+  【各头各取最优权重】集成 5 个seed；val上最优偏置: down +1.00, up +1.25  → val macro-F1 0.5626
+  (基线也在val上调同样的偏置，公平对比：TF先验 val macro-F1 0.4528；TF×结合先验 0.4618)
+  【ensemble+TF×结合先验 堆叠】val上拟合的标准化系数(截距, 模型dn, 模型up, 先验dn, 先验up)：down类 [-6.14, 1.67, 0.01, 1.16, -0.03]  up类 [-6.23, 0.1, 1.46, -0.08, 1.18]；val macro-F1(调偏置后) 0.5578
+  【ensemble_perhead+TF×结合先验 堆叠】val上拟合的标准化系数(截距, 模型dn, 模型up, 先验dn, 先验up)：down类 [-6.11, 1.67, 0.01, 1.11, -0.04]  up类 [-6.16, 0.1, 1.47, -0.06, 1.08]；val macro-F1(调偏置后) 0.5599
+  集成test指标的按基因整群bootstrap(1000次)...
+
+[8] 写文件
+
+[10] 关键结果
+  (a) 每个seed最优权重下的loss分项(λ加权前；share_*=该项×λ占total的比例)：
+      seed42 val : l_a=0.483 l_b=0.334 l_c=0.129 l_sign=0.024 l_bd=0.068 total=1.017(evaluate报的1.017)  占比A/B/C=48%/33%/13%/Bd=7%
+      seed42 test: l_a=0.509 l_b=0.293 l_c=0.141 l_sign=0.022 l_bd=0.069 total=1.015(evaluate报的1.015)  占比A/B/C=50%/29%/14%/Bd=7%
+      seed123 val : l_a=0.480 l_b=0.341 l_c=0.130 l_sign=0.018 l_bd=0.067 total=1.020(evaluate报的1.020)  占比A/B/C=47%/33%/13%/Bd=7%
+      seed123 test: l_a=0.478 l_b=0.304 l_c=0.144 l_sign=0.016 l_bd=0.068 total=0.996(evaluate报的0.996)  占比A/B/C=48%/31%/14%/Bd=7%
+      seed456 val : l_a=0.509 l_b=0.336 l_c=0.130 l_sign=0.019 l_bd=0.066 total=1.044(evaluate报的1.044)  占比A/B/C=49%/32%/12%/Bd=6%
+      seed456 test: l_a=0.484 l_b=0.295 l_c=0.140 l_sign=0.017 l_bd=0.066 total=0.986(evaluate报的0.986)  占比A/B/C=49%/30%/14%/Bd=7%
+      seed789 val : l_a=0.510 l_b=0.335 l_c=0.134 l_sign=0.020 l_bd=0.068 total=1.049(evaluate报的1.049)  占比A/B/C=49%/32%/13%/Bd=6%
+      seed789 test: l_a=0.488 l_b=0.291 l_c=0.143 l_sign=0.019 l_bd=0.068 total=0.992(evaluate报的0.992)  占比A/B/C=49%/29%/14%/Bd=7%
+      seed2024 val : l_a=0.483 l_b=0.326 l_c=0.132 l_sign=0.022 l_bd=0.067 total=1.011(evaluate报的1.011)  占比A/B/C=48%/32%/13%/Bd=7%
+      seed2024 test: l_a=0.506 l_b=0.293 l_c=0.144 l_sign=0.018 l_bd=0.068 total=1.013(evaluate报的1.013)  占比A/B/C=50%/29%/14%/Bd=7%
+  (b) test 宽表(行=模型/基线，nan=该指标对这个基线没定义)。列名缩写：A_r/A_rho=Head A基因级Pearson/Spearman；B_sign=符号准确率；B_r|dn、B_r|up=只在真实下调/上调子集内的r；B_r|TF=TF内中心化r；C_mF1=macro-F1；AUC=AUROC；AP=AUPRC；B_dr/B_drns=Head B 预测 vs 稠密log2FC(全部有值样本/只看不显著样本)
+      model                        A_r   A_rho     B_r   B_rho  B_rmse  B_sign  B_r|dn  B_r|up  B_r|TF   C_acc   C_mF1  C_F1dn  C_F1ns  C_F1up C_AUCdn C_AUCup  C_APdn  C_APup    B_dr  B_drns
+      seed42                     0.495   0.447   0.586   0.588   0.822   0.761   0.294   0.414   0.546   0.962   0.491   0.305   0.981   0.187   0.901   0.872   0.329   0.234   0.318   0.185
+      seed123                    0.520   0.500   0.567   0.567   0.836   0.742   0.323   0.390   0.524   0.962   0.504   0.330   0.981   0.202   0.893   0.868   0.325   0.226   0.300   0.158
+      seed456                    0.529   0.509   0.592   0.593   0.818   0.753   0.368   0.422   0.548   0.963   0.501   0.303   0.981   0.218   0.904   0.868   0.341   0.241   0.321   0.167
+      seed789                    0.519   0.481   0.586   0.599   0.822   0.761   0.336   0.414   0.539   0.963   0.517   0.344   0.981   0.227   0.894   0.872   0.349   0.235   0.321   0.170
+      seed2024                   0.489   0.453   0.578   0.588   0.828   0.755   0.336   0.388   0.529   0.962   0.499   0.325   0.981   0.192   0.898   0.863   0.341   0.222   0.318   0.173
+      seed42_perhead             0.549   0.524   0.586   0.588   0.822   0.761   0.294   0.414   0.546   0.962   0.496   0.301   0.981   0.208   0.900   0.873   0.329   0.231   0.318   0.185
+      seed123_perhead            0.559   0.526   0.581   0.583   0.826   0.747   0.359   0.405   0.540   0.962   0.504   0.330   0.981   0.202   0.893   0.868   0.325   0.226   0.316   0.166
+      seed456_perhead            0.550   0.520   0.598   0.599   0.813   0.756   0.360   0.415   0.551   0.963   0.501   0.303   0.981   0.218   0.904   0.868   0.341   0.241   0.324   0.177
+      seed789_perhead            0.531   0.503   0.586   0.599   0.822   0.761   0.336   0.414   0.539   0.963   0.499   0.337   0.981   0.180   0.902   0.878   0.351   0.232   0.321   0.170
+      seed2024_perhead           0.529   0.506   0.578   0.588   0.828   0.755   0.336   0.388   0.529   0.962   0.499   0.325   0.981   0.192   0.898   0.863   0.341   0.222   0.318   0.173
+      ensemble                   0.562   0.524   0.614   0.624   0.804   0.772   0.356   0.435   0.571   0.964   0.497   0.314   0.982   0.195   0.913   0.886   0.374   0.258   0.349   0.193
+      ensemble+C_offset            nan     nan     nan     nan     nan     nan     nan     nan     nan   0.957   0.559   0.402   0.979   0.296     nan     nan     nan     nan     nan     nan
+      ensemble+prior_stack         nan     nan     nan     nan     nan     nan     nan     nan     nan   0.955   0.558   0.399   0.978   0.299   0.921   0.895   0.371   0.264     nan     nan
+      ensemble_perhead           0.591   0.562   0.617   0.627   0.800   0.770   0.362   0.437   0.574   0.964   0.493   0.309   0.982   0.189   0.913   0.887   0.372   0.258   0.352   0.196
+      ensemble_perhead+C_offset     nan     nan     nan     nan     nan     nan     nan     nan     nan   0.956   0.559   0.413   0.978   0.287     nan     nan     nan     nan     nan     nan
+      ensemble_perhead+prior_stack     nan     nan     nan     nan     nan     nan     nan     nan     nan   0.955   0.557   0.400   0.978   0.294   0.921   0.895   0.369   0.261     nan     nan
+      base_TF_dense_mean(B)        nan     nan   0.224   0.185   1.003   0.549   0.176   0.293   0.000     nan     nan     nan     nan     nan     nan     nan     nan     nan   0.121   0.092
+      base_TF_mean(B)              nan     nan   0.347   0.265   0.951   0.587   0.206   0.349  -0.000     nan     nan     nan     nan     nan     nan     nan     nan     nan   0.031  -0.018
+      base_TF_prior(C)             nan     nan     nan     nan     nan     nan     nan     nan     nan   0.936   0.454   0.174   0.970   0.217   0.891   0.856   0.171   0.133     nan     nan
+      base_TFxbound(B)             nan     nan   0.391   0.319   0.935   0.610   0.292   0.325   0.192     nan     nan     nan     nan     nan     nan     nan     nan     nan   0.058  -0.009
+      base_TFxbound_prior(C)       nan     nan     nan     nan     nan     nan     nan     nan     nan   0.943   0.465   0.198   0.973   0.225   0.896   0.868   0.216   0.144     nan     nan
+      base_always_ns(C)            nan     nan     nan     nan     nan     nan     nan     nan     nan   0.961   0.327   0.000   0.980   0.000     nan     nan     nan     nan     nan     nan
+      base_layout_linreg(A)      0.259   0.279     nan     nan     nan     nan     nan     nan     nan     nan     nan     nan     nan     nan     nan     nan     nan     nan     nan     nan
+      ORACLE_gene_otherTF(B)       nan     nan   0.458   0.551   0.934   0.817  -0.138   0.161   0.468     nan     nan     nan     nan     nan     nan     nan     nan     nan     nan     nan
+      ORACLE_gene_otherTF(C)       nan     nan     nan     nan     nan     nan     nan     nan     nan   0.897   0.403   0.131   0.946   0.132   0.750   0.779   0.068   0.070     nan     nan
+      参照：AUROC随机=0.5；AUPRC随机=该类在test里的占比(down 0.0209、up 0.0182)；永远猜ns的acc=0.9609、macro-F1=0.3267
+  (c) 集成test按基因整群95% CI: r_a=(0.5096930727362633, 0.6138724640011788)  r_b=(0.5737353295087815, 0.6537383645772934)  macro_f1(argmax)=(0.4836892439057583, 0.5126892291867422)
+  (d) 逐TF：43 个TF有≥20个显著test样本，TF内r_b 中位数 0.546、四分位 0.379~0.642；r<0 的TF 0 个
+  (e) val Head C 偏置: down +0.75/up +1.25
+  (f)【各头各取最优权重】集成test按基因整群95% CI: r_a=(0.5425416633486748, 0.6386868104338645)  r_b=(0.5781797632575035, 0.65590298473835)  macro_f1(argmax)=(0.4798619787407652, 0.5079941682882527)；val偏置 down +1.00/up +1.25
+  (h) Head C TF内AUROC(down，57个TF有≥5个down样本；只比同一被耗竭TF内部的基因排序)：模型集成 中位 0.766  vs TF×结合先验 0.528
+  (h) Head C TF内AUROC(up，62个TF有≥5个up样本；只比同一被耗竭TF内部的基因排序)：模型集成 中位 0.756  vs TF×结合先验 0.552
+  (i) ensemble+TF先验堆叠 test：AUROC dn/up=0.921/0.895  AUPRC dn/up=0.371/0.264  macro-F1(val调偏置)=0.558；标准化系数 down [-6.144, 1.669, 0.008, 1.157, -0.03] up [-6.227, 0.102, 1.462, -0.079, 1.184](截距,模型dn,模型up,先验dn,先验up)
+  (i) ensemble_perhead+TF先验堆叠 test：AUROC dn/up=0.921/0.895  AUPRC dn/up=0.369/0.261  macro-F1(val调偏置)=0.557；标准化系数 down [-6.107, 1.672, 0.01, 1.111, -0.039] up [-6.164, 0.098, 1.471, -0.063, 1.084](截距,模型dn,模型up,先验dn,先验up)
+  (j) Head B vs 稠密 log2FC(test)：集成 B_dr=0.349、只看不显著样本 B_dr_ns=0.193(RMSE 0.242)；TF稠密均值基线 0.121/0.092  (这个实验训练时用了稠密目标)
+  (g) 每个seed选中的权重(16号第2批记录)：
+      seed42: 按composite选中 val#33 @epoch8.4998，停止原因=patience；各头最优 A@1.0  B@8.4998  C@9.0
+      seed123: 按composite选中 val#35 @epoch9.0，停止原因=patience；各头最优 A@1.2499  B@11.0  C@9.0
+      seed456: 按composite选中 val#40 @epoch10.2499，停止原因=patience；各头最优 A@1.4998  B@11.0  C@10.2499
+      seed789: 按composite选中 val#41 @epoch10.4998，停止原因=patience；各头最优 A@0.4998  B@10.4998  C@8.0
+      seed2024: 按composite选中 val#47 @epoch12.0，停止原因=patience；各头最优 A@1.0  B@12.0  C@12.0
+
+  写出 23 个文件到 out/results/v4_abl_no_cis/ ：
+    checkpoint_inventory.csv
+    learning_curves.csv
+    metrics_long.csv
+    metrics_test_wide.csv
+    head_loss_parts.csv
+    recheck_vs_stored.csv
+    ctx_diagnostic_per_tf.csv
+    per_tf_test.csv
+    per_gene_head_a.csv
+    head_c_per_class.csv
+    confusion_test_ensemble.csv
+    confusion_test_ensemble_offset.csv
+    predictions_test.parquet
+    predictions_test.csv.gz
+    predictions_val.parquet
+    fig/head_a_scatter_test.png
+    fig/head_b_scatter_test.png
+    fig/head_b_within_tf_r.png
+    fig/head_c_confusion_test.png
+    fig/learning_curves.png
+    fig/model_vs_baselines_test.png
+    fig/val_loss_parts.png
+    fig/val_metric_curves.png
+
+总用时 4.8 分钟。把 out/results/v4_abl_no_cis/summary.txt 整个贴回来即可。

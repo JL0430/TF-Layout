@@ -1,0 +1,74 @@
+==============================================================================
+实验对比  2026-10-01 16:35:05  参照=['v8_headA_all']  实验=['v8_headA_all', 'v10_abl_no_knockout']
+==============================================================================
+  v8_headA_all: val 84692 条 / test 101680 条；seed: selected=[42, 123, 456, 789, 2024]；perhead=[42, 123, 456, 789, 2024]
+  v10_abl_no_knockout: val 84692 条 / test 101680 条；seed: selected=[42, 123, 456, 789, 2024]；perhead=[42, 123, 456, 789, 2024]
+比较用的 seed(各实验都在这组 seed 上重算集成)：[42, 123, 456, 789, 2024]
+稠密 log2FC：out/head_b_dense_target.parquet -> test 100860/101680 条有值(不显著样本里 99.2%)
+
+[1] 共有 seed [42, 123, 456, 789, 2024] 上的集成(ensemble5)，C_mF1=在 val 上调偏置后的 test macro-F1
+      run/variant                       A_r      B_r   B_sign   B_r|TF  C_AUCdn  C_AUCup   C_APdn   C_APup    C_mF1     B_dr   B_drns
+      v8_headA_all/selected           0.568    0.638    0.787    0.596    0.914    0.890    0.393    0.261    0.568    0.375    0.209
+      v8_headA_all/selected+stack       nan      nan      nan      nan    0.923    0.898    0.391    0.267    0.568      nan      nan
+      v8_headA_all/perhead            0.593    0.635    0.778    0.592    0.911    0.892    0.388    0.263    0.569    0.369    0.202
+      v8_headA_all/perhead+stack        nan      nan      nan      nan    0.921    0.898    0.386    0.266    0.567      nan      nan
+      v10_abl_no_knockout/selected    0.573    0.619    0.786    0.573    0.910    0.888    0.366    0.255    0.563    0.361    0.200
+      v10_abl_no_knockout/selected+stack      nan      nan      nan      nan    0.921    0.897    0.371    0.260    0.561      nan      nan
+      v10_abl_no_knockout/perhead     0.573    0.623    0.783    0.577    0.909    0.889    0.362    0.256    0.556    0.362    0.204
+      v10_abl_no_knockout/perhead+stack      nan      nan      nan      nan    0.921    0.898    0.369    0.259    0.556      nan      nan
+      (+stack 行=模型集成与 TF×结合先验在 val 上堆叠，只算 Head C；A/B 列为 nan)
+      (B_dr/B_drns=Head B 预测 vs 21号稠密log2FC：全部有值样本/只看不显著样本)
+
+[2] 逐 seed 均值±std(同一组 seed)
+  v8_headA_all/selected: A_r=0.518±0.013  B_r=0.602±0.007  B_sign=0.762±0.002  B_r|TF=0.558±0.008  C_AUCdn=0.896±0.006  C_AUCup=0.868±0.006  C_APdn=0.355±0.009  C_APup=0.231±0.010  C_mF1=0.550±0.007  B_dr=0.339±0.003  B_drns=0.184±0.004
+  v8_headA_all/selected+stack: C_AUCdn=0.918±0.002  C_AUCup=0.891±0.001  C_APdn=0.356±0.010  C_APup=0.246±0.006  C_mF1=0.551±0.006
+  v8_headA_all/perhead: A_r=0.538±0.012  B_r=0.599±0.004  B_sign=0.753±0.010  B_r|TF=0.554±0.007  C_AUCdn=0.893±0.004  C_AUCup=0.872±0.006  C_APdn=0.350±0.008  C_APup=0.235±0.008  C_mF1=0.550±0.005  B_dr=0.332±0.006  B_drns=0.177±0.008
+  v8_headA_all/perhead+stack: C_AUCdn=0.916±0.001  C_AUCup=0.891±0.002  C_APdn=0.354±0.007  C_APup=0.244±0.003  C_mF1=0.551±0.004
+  v10_abl_no_knockout/selected: A_r=0.523±0.008  B_r=0.585±0.014  B_sign=0.760±0.006  B_r|TF=0.537±0.014  C_AUCdn=0.894±0.005  C_AUCup=0.869±0.002  C_APdn=0.330±0.009  C_APup=0.227±0.007  C_mF1=0.545±0.006  B_dr=0.327±0.010  B_drns=0.178±0.006
+  v10_abl_no_knockout/selected+stack: C_AUCdn=0.917±0.001  C_AUCup=0.892±0.002  C_APdn=0.342±0.005  C_APup=0.240±0.002  C_mF1=0.549±0.001
+  v10_abl_no_knockout/perhead: A_r=0.521±0.016  B_r=0.589±0.009  B_sign=0.761±0.004  B_r|TF=0.542±0.012  C_AUCdn=0.892±0.005  C_AUCup=0.871±0.005  C_APdn=0.323±0.012  C_APup=0.230±0.006  C_mF1=0.544±0.005  B_dr=0.328±0.003  B_drns=0.181±0.005
+  v10_abl_no_knockout/perhead+stack: C_AUCdn=0.917±0.002  C_AUCup=0.892±0.002  C_APdn=0.341±0.007  C_APup=0.239±0.004  C_mF1=0.546±0.003
+
+[3] 差值(集成对集成；只打印 ['selected', 'perhead'] 这几套，全部差值见 delta_vs_reference.csv)；95% CI=配对按基因整群 bootstrap(500次)；逐seed配对差=同一 seed 两个实验相减再平均，括号里是 5 个 seed 中变好的个数。CI 不含0才算超出 test 抽样噪声(只反映 test 基因抽样的不确定性，不含训练随机性——只有2个seed时训练随机性要看逐seed配对差)
+  ── 参照 v8_headA_all/selected ──
+  v10_abl_no_knockout/selected:
+      A_r      0.5684 -> 0.5733  Δ=+0.0050  CI=(-0.0190, +0.0308)  逐seed配对差 +0.0045(2/5)
+      B_r      0.6383 -> 0.6194  Δ=-0.0190  CI=(-0.0328, -0.0040) ↓  逐seed配对差 -0.0179(0/5)
+      B_sign   0.7867 -> 0.7857  Δ=-0.0010  CI=(-0.0125, +0.0104)  逐seed配对差 -0.0012(3/5)
+      B_r|TF   0.5961 -> 0.5732  Δ=-0.0229  CI=(-0.0389, -0.0065) ↓  逐seed配对差 -0.0215(0/5)
+      B_dr     0.3751 -> 0.3605  Δ=-0.0146  CI=(-0.0234, -0.0054) ↓  逐seed配对差 -0.0123(0/5)
+      B_drns   0.2087 -> 0.2003  Δ=-0.0084  CI=(-0.0162, -0.0007) ↓  逐seed配对差 -0.0065(1/5)
+      C_AUCdn  0.9141 -> 0.9101  Δ=-0.0040  CI=(-0.0082, +0.0001)  逐seed配对差 -0.0016(1/5)
+      C_APdn   0.3932 -> 0.3662  Δ=-0.0270  CI=(-0.0383, -0.0165) ↓  逐seed配对差 -0.0246(0/5)
+      C_AUCup  0.8902 -> 0.8879  Δ=-0.0022  CI=(-0.0070, +0.0029)  逐seed配对差 +0.0015(3/5)
+      C_APup   0.2614 -> 0.2550  Δ=-0.0064  CI=(-0.0180, +0.0034)  逐seed配对差 -0.0040(2/5)
+      C_mF1    0.5685 -> 0.5625  Δ=-0.0060  CI=(-0.0124, +0.0004)  逐seed配对差 -0.0054(1/5)
+  ── 参照 v8_headA_all/perhead ──
+  v10_abl_no_knockout/perhead:
+      A_r      0.5935 -> 0.5731  Δ=-0.0204  CI=(-0.0399, +0.0009)  逐seed配对差 -0.0169(2/5)
+      B_r      0.6348 -> 0.6226  Δ=-0.0122  CI=(-0.0270, +0.0026)  逐seed配对差 -0.0100(2/5)
+      B_sign   0.7782 -> 0.7832  Δ=+0.0050  CI=(-0.0059, +0.0165)  逐seed配对差 +0.0087(4/5)
+      B_r|TF   0.5915 -> 0.5771  Δ=-0.0144  CI=(-0.0299, +0.0011)  逐seed配对差 -0.0115(2/5)
+      B_dr     0.3692 -> 0.3618  Δ=-0.0074  CI=(-0.0160, +0.0009)  逐seed配对差 -0.0043(1/5)
+      B_drns   0.2018 -> 0.2040  Δ=+0.0022  CI=(-0.0049, +0.0096)  逐seed配对差 +0.0039(4/5)
+      C_AUCdn  0.9106 -> 0.9093  Δ=-0.0012  CI=(-0.0058, +0.0032)  逐seed配对差 -0.0005(2/5)
+      C_APdn   0.3876 -> 0.3622  Δ=-0.0254  CI=(-0.0380, -0.0122) ↓  逐seed配对差 -0.0268(0/5)
+      C_AUCup  0.8922 -> 0.8893  Δ=-0.0029  CI=(-0.0076, +0.0022)  逐seed配对差 -0.0013(3/5)
+      C_APup   0.2631 -> 0.2557  Δ=-0.0073  CI=(-0.0178, +0.0029)  逐seed配对差 -0.0051(2/5)
+      C_mF1    0.5688 -> 0.5557  Δ=-0.0130  CI=(-0.0217, -0.0054) ↓  逐seed配对差 -0.0060(2/5)
+
+[5] 判读表(基于 [3] 段的差值；更好=CI>0，更差=CI<0，非劣=CI含0且下界>−margin，无法排除明显变差=CI含0且下界≤−margin；margin 见 CONFIG['noninf_margin']，建议值)
+  v10_abl_no_knockout/selected 对 v8_headA_all/selected: 更好[] 更差[B_r,B_r|TF,C_APdn] 非劣[A_r,B_sign,C_AUCdn,C_AUCup,C_APup] 无法排除明显变差[C_mF1]
+  v10_abl_no_knockout/perhead 对 v8_headA_all/perhead: 更好[] 更差[C_APdn,C_mF1] 非劣[B_sign,C_AUCdn,C_AUCup,C_APup] 无法排除明显变差[A_r,B_r,B_r|TF]
+
+[6] 按 D∈L_g 分层的差值(参照 v8_headA_all/perhead，全局共有 seed [42, 123, 456, 789, 2024] 的集成；Δ=实验−参照，*=配对整群 bootstrap 95% CI 不含0；只算集成)。D∈L_g=被耗竭 TF 在该基因启动子上有位点(位点删除只在
+      这一层改变输入)；D∉L_g 那层对 no_knockout 来说输入完全相同，差值只反映训练随机性(阴性对照)
+                                       B_r    B_r|TF    B_sign    B_drns   C_AUCdn    C_APdn   C_AUCup    C_APup     C_mF1
+  D∈L_g：14036 条样本(13.8%)，显著 966、down 540、up 426
+      参照 v8_headA_all                0.646     0.484     0.815     0.195     0.919     0.553     0.890     0.326     0.625
+      Δ v10_abl_no_knockout        -0.029    -0.005    -0.032    +0.001    -0.007*   -0.034*   -0.011*   -0.045*   -0.024*
+  D∉L_g：87644 条样本(86.2%)，显著 3010、down 1583、up 1427
+      参照 v8_headA_all                0.626     0.607     0.766     0.204     0.906     0.323     0.890     0.244     0.547
+      Δ v10_abl_no_knockout        -0.003    +0.008    -0.006    +0.002    +0.000    -0.017*   -0.002    +0.005    -0.007 
+
+写出: out/results/_compare_b11/comparison_long.csv、delta_vs_reference.csv、headline_all_seeds.csv、verdict.csv、strata_delta.csv、comparison_test.png、summary.txt  (用时 266 秒)

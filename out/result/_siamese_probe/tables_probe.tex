@@ -1,0 +1,71 @@
+% 28_siamese_probe.py 自动生成(27 号 --tables 时并入 _paper/tables.tex)
+
+\begin{table}[t]
+\centering
+\caption{Hyper-parameters and compute of the final model (read from the saved checkpoints; full list in hyperparams.csv).}
+\label{tab:hparams}
+\setlength{\tabcolsep}{3pt}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lc}
+\toprule
+Setting & Value \\
+\midrule
+Embedding dim.\ / attention heads & 256 / 8 \\
+cis Transformer layers & 6 \\
+Layout Transformer layers & 4 \\
+BPE vocabulary size & 4000 \\
+Dropout & 0.2 \\
+Optimizer / weight decay & adamw / 0.05 \\
+Learning rate / schedule & 0.0001 / warmup\_cosine \\
+Warm-up steps / min.\ LR ratio & 500 / 0.05 \\
+Batch size (pairs) / TFs per gene & 192 / 4 \\
+Max.\ epochs / validation interval (epoch) / patience & 15 / 0.25 / 12 \\
+Gradient clipping / mixed precision & 1 / bf16 \\
+Loss weights $\lambda_A,\lambda_B,\lambda_C,\lambda_{\mathrm{sign}},\lambda_{\mathrm{dense}}$ & 1 / 1 / 1 / 0.1 / 1 \\
+Head B loss / Huber $\delta$ & huber / 1 \\
+Head C focal $\gamma$ / class-balance $\beta$ & 0 / 0.999 \\
+Condition encoding / Head C mode & marker / delta\_tf \\
+Model selection / per-head best weights & composite / yes \\
+Head A trained on all genes & yes \\
+\midrule
+Parameters & 9{,}935{,}516 \\
+Training time per seed (min) & 73 $\pm$ 5 \\
+Epochs trained / selected (mean) & 13.6 / 10.7 \\
+Seeds in ensemble & 5 \\
+Hardware & NVIDIA GeForce RTX 3090 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table*}[t]
+\centering
+\caption{Where the benefit of explicit site deletion comes from (5-seed ensembles, test set). ``train $\pm$'': model trained with/without deleting the depleted TF's sites ($L_g\setminus D$); ``infer $\pm$'': the same at inference. $\Delta$ = variant $-$ comparator (negative = worse without deletion). For $D\notin L_g$ the two inference modes receive identical inputs, so the inference-only and zero-shot differences are exactly 0.}
+\label{tab:siamese}
+\setlength{\tabcolsep}{3pt}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lccccc}
+\toprule
+Comparison & AUPRC$_\downarrow$ & AUPRC$_\uparrow$ & AUROC$_\downarrow$ & AUROC$_\uparrow$ & $r_B$ within TF \\
+\midrule
+\multicolumn{6}{l}{\textit{$D\in L_g$} (14036 pairs, 966 significant)} \\
+\quad Reference (train $+$, infer $+$) & 0.553 & 0.326 & 0.919 & 0.890 & 0.484 \\
+\quad $\Delta$ inference only (train $+$; infer $-$ vs.\ $+$) & $-0.133^{\dagger}$ & $-0.099^{\dagger}$ & $-0.026^{\dagger}$ & $-0.040^{\dagger}$ & $-0.048^{\dagger}$ \\
+\quad $\Delta$ training only (infer $-$; train $-$ vs.\ $+$) & $+0.099^{\dagger\ddagger\S}$ & $+0.054^{\dagger\ddagger\S}$ & $+0.018^{\dagger\ddagger\S}$ & $+0.029^{\dagger\ddagger\S}$ & $+0.016$ \\
+\quad $\Delta$ total (= training ablation) & $-0.034^{\dagger\ddagger\S}$ & $-0.045^{\dagger\ddagger\S}$ & $-0.007^{\dagger}$ & $-0.011^{\dagger}$ & $-0.032$ \\
+\quad $\Delta$ zero-shot (train $-$; infer $+$ vs.\ $-$) & $-0.199^{\dagger}$ & $-0.156^{\dagger}$ & $-0.034^{\dagger}$ & $-0.080^{\dagger}$ & $-0.005$ \\
+\multicolumn{6}{l}{\textit{$D\notin L_g$} (87644 pairs, 3010 significant)} \\
+\quad Reference (train $+$, infer $+$) & 0.323 & 0.244 & 0.906 & 0.890 & 0.607 \\
+\quad $\Delta$ inference only (train $+$; infer $-$ vs.\ $+$) & $\equiv 0$ & $\equiv 0$ & $\equiv 0$ & $\equiv 0$ & $\equiv 0$ \\
+\quad $\Delta$ training only (infer $-$; train $-$ vs.\ $+$) & $-0.017^{\dagger\ddagger}$ & $+0.005$ & $+0.000$ & $-0.002$ & $-0.006$ \\
+\quad $\Delta$ total (= training ablation) & $-0.017^{\dagger\ddagger}$ & $+0.005$ & $+0.000$ & $-0.002$ & $-0.006$ \\
+\quad $\Delta$ zero-shot (train $-$; infer $+$ vs.\ $-$) & $\equiv 0$ & $\equiv 0$ & $\equiv 0$ & $\equiv 0$ & $\equiv 0$ \\
+\multicolumn{6}{l}{\textit{All test pairs} (101680 pairs, 3976 significant)} \\
+\quad Reference (train $+$, infer $+$) & 0.388 & 0.263 & 0.911 & 0.892 & 0.592 \\
+\quad $\Delta$ inference only (train $+$; infer $-$ vs.\ $+$) & $-0.045^{\dagger}$ & $-0.024^{\dagger}$ & $-0.006^{\dagger}$ & $-0.007^{\dagger}$ & $-0.024^{\dagger}$ \\
+\quad $\Delta$ training only (infer $-$; train $-$ vs.\ $+$) & $+0.020^{\dagger\ddagger\S}$ & $+0.017^{\dagger\ddagger}$ & $+0.004$ & $+0.004$ & $+0.010$ \\
+\quad $\Delta$ total (= training ablation) & $-0.025^{\dagger\ddagger\S}$ & $-0.007$ & $-0.001$ & $-0.003$ & $-0.014$ \\
+\quad $\Delta$ zero-shot (train $-$; infer $+$ vs.\ $-$) & $-0.072^{\dagger}$ & $-0.087^{\dagger}$ & $-0.007^{\dagger}$ & $-0.015^{\dagger}$ & $-0.001$ \\
+\bottomrule
+\end{tabular}}
+\par\smallskip\parbox{0.97\linewidth}{\scriptsize $\dagger$: 95\% gene-cluster bootstrap CI excludes 0. $\ddagger$: interval additionally including seed-to-seed training variability (from the reference model's seeds, extrapolated to $k$ seeds) excludes 0. $\S$: same with the measured 2-seed variability (no extrapolation; conservative). $\ddagger$/$\S$ apply only where two different sets of weights are compared.}
+\end{table*}

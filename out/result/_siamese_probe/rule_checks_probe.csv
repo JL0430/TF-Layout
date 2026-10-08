@@ -1,0 +1,11 @@
+rule,holds,numbers
+(p1) D∈L_g 层 Δ_infer 的 C_APdn 或 C_APup 明显<0(推理时读删位点对比),True,"C_APdn -0.133[-0.167,-0.100] 逐seed 0/5 变好  C_APup -0.099[-0.135,-0.069] 逐seed 0/5 变好"
+(p2) D∈L_g 层 Δ_infer 的 |C_APdn|、|C_APup| 都<0.01(收益几乎全在训练期),False,C_APdn -0.133  C_APup -0.099
+(p3) D∉L_g 层 Δ_train 的 C_APdn<0 且保守合成区间(§)不含0(删位点训练对间接响应也有用),False,"C_APdn -0.017 合成(-0.033,-0.001) 保守(-0.037,+0.004) 逐seed 0/5 变好"
+(p4) D∈L_g 层 Δ_zero 的 C_APdn、C_APup 都在 ±0.01 内(删 token 本身无害),False,C_APdn -0.199†  C_APup -0.156†
+"(p5) Spearman(ε_C, role_test)>0 且 TF bootstrap CI 不含0(删位点效应带着 TF 方向)",True,"W +0.850[+0.672,+0.917](33 个 TF)；N 对照 +0.517"
+(p6) e_C 的 TF 内合并 AUROC(down vs up)>0.5 且 CI 不含0.5(基因特异的方向信息),True,"W 0.665[0.607,0.718]；合并 0.790；N 对照 TF 内 0.453"
+自检 (s1),True,v8_headA_all seed42 原生格 W_del vs 17 号导出 最大差 0.00e+00(共 10 项)
+自检 (s2),True,v8_headA_all seed42 D∉L_g 行 del vs nodel 最大差 0.00e+00(共 10 项)
+自检 (s3),True,Δ_total vs 19 号 out/results/_compare_b11：21 项，最大差 9.7e-17
+自检 (s4),True,自算 D∈L_g vs 17 号导出 D_in_Lg：不一致 0 行

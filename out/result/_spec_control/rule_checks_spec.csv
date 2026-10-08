@@ -1,0 +1,8 @@
+rule,holds,numbers
+(q1) Δ_spec 的 C_APdn 和 C_APup 都明显 <0(删错比删对差 -> 删位点效应是 D 特异的),True,"C_APdn -0.208[-0.244,-0.170](0/5 变好)  C_APup -0.129[-0.171,-0.093](0/5 变好)"
+(q2) Δ_wn 的 C_APdn、C_APup 都不明显 >0(删错相对不删没有通用收益),True,"C_APdn -0.074[-0.097,-0.052](0/5 变好)  C_APup -0.030[-0.045,-0.017](0/5 变好)"
+(q3) 错配删除的 ε_C 跟被删 TF 自己的 role 的 Spearman >0 且 TF bootstrap CI 不含0,True,"错配 +0.792[+0.664,+0.874](67 个 TF)；真删 +0.798"
+(q4) e_C 的 TF 内合并 AUROC：真删 − 错配删 ≥0.05 且配对 bootstrap CI 不含0,True,"真删 0.665  错配 0.473  差 +0.192[+0.104,+0.282]"
+自检 (s1),True,v8_headA_all seed42 W_del vs 17 号导出 最大差 0.00e+00(共 5 项)
+自检 (s2),True,v8_headA_all seed42 不可配对行 W_wrong vs W_del 最大差 0.00e+00(共 5 项)
+自检 (s5),True,包装类抽样核对 2000 行：layout_d 没有 D'、保留 D、少掉的位点数=D' 的位点数；不一致 0 行

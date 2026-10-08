@@ -1,0 +1,1 @@
+{"seeds": [42, 123], "references": ["v8_headA_all"], "runs": ["v8_headA_all", "v10_abl_no_cis", "v10_abl_no_knockout", "v10_abl_no_layout", "v10_lambda_a03"], "stack": true, "dense_target": "out/head_b_dense_target.parquet", "match_variant": true, "pairwise": [], "strata": true}

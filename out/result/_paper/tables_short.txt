@@ -1,0 +1,27 @@
+Table 1. Main comparison on held-out chromosomes (101,680 gene-TF pairs, 820 genes, 3,976 significant). Top: absolute values (bold: best among baselines and our ensemble). Bottom: differences; † bootstrap 95% CI excludes 0; ‡ the interval that also includes re-training variability excludes 0.
+                                                       r_B|TF     AUROC_dn     AUPRC_dn     AUPRC_up wTF-AUROC_dn
+    B4 pair + TF prior                                  0.257        0.899        0.237        0.159        0.589
+    B6 GBDT + WT expr.                                  0.534        0.911        0.281        0.208        0.704
+    B7a GBDT + flat layout                              0.548        0.918        0.338        0.242        0.750
+    B7a-bag (bagged)                                    0.558        0.921        0.357        0.248        0.761
+    B7b-bag (+ WT expr.)                                0.650        0.928        0.384        0.283        0.793
+    ------------------------------------------------------------
+    Ours, 1 seed (mean ± sd)                      0.554±0.008  0.893±0.005  0.350±0.009  0.235±0.009  0.752±0.006
+    Ours, 5-seed ens.                                   0.592        0.911        0.388        0.263        0.774
+    Ours + B7b-bag (stack)                              0.678        0.932        0.423        0.298           --
+    ------------------------------------------------------------
+    Ours ens. - B7a-bag                               +0.034†     -0.010†‡     +0.031†‡       +0.015       +0.013
+    Ours 1 seed (mean) - B7a                           +0.006     -0.026†‡       +0.012       -0.008       +0.002
+
+Table 2. Mechanism: component ablations (Δ = ablation − reference) and a deletion-specificity control at inference. Reference rows: the full model trained with the same seeds, absolute values on all test pairs (k = number of seeds). † bootstrap 95% CI excludes 0; ‡ the interval that also includes re-training variability excludes 0; § (k>2) also excludes 0 without extrapolating the 2-seed variability to k seeds.
+                                                     d r_B|TF   d AUPRC_dn   d AUPRC_up
+    Reference (k=2 seeds)                               0.580        0.372        0.243
+    w/o layout (k=2)                                 -0.321†‡     -0.195†‡     -0.110†‡
+    w/o cis (k=2)                                      +0.004       +0.005       +0.004
+    ------------------------------------------------------------
+    Reference (k=5 seeds)                               0.592        0.388        0.263
+    w/o site deletion (k=5)                            -0.014    -0.025†‡§       -0.007
+       only D in L_g pairs (k=5)                       -0.032    -0.034†‡§    -0.045†‡§
+    ------------------------------------------------------------
+    Wrong - correct TF deleted (inference)            -0.048†      -0.208†      -0.129†
+

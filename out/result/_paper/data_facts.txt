@@ -1,0 +1,11 @@
+# Data facts used by the short paper (hand-copied from status_25 sections 3, 4 and 7.22; each line names its source).
+# Copy this file into out/results/_paper/ so that 30_manuscript_check.py accepts these numbers.
+ChEC-seq binding: 538 bigWig tracks; 216723 peaks; 178 TFs [status 3: 00-02]
+Layout: 214329 sites in 5373 promoters; median 27 sites per promoter [status 3: 04]
+Motif anchoring: 92 of 178 TFs (51.7%); 17519 of 216723 sites (8.1%) at base-pair resolution; motif-to-peak-summit offset SD 51.5 bp, about 50 bp [status 3: 03, 06]
+Head A genes: 6572 genes; train 4524; validation 940 (chrXIII, chrXIV); test 1108 (chrXV, chrXVI) [status 3: 08]
+Gene-TF pairs: 618975 labels; 33075 dropped (7 induced-condition experiments); 585900 = 4725 genes x 124 TFs; down 12410 (2.12%); unchanged 563334 (96.15%); up 10156 (1.73%) [status 3: 09]
+Split of the 4725 genes: train 3222; validation 683; test 820; pairs 399528 / 84692 / 101680 [status 3: 09]
+Model: 9935516 parameters (9.9 million); 73.3 minutes per seed on one RTX 3090; epochs 12 to 15 [status 7.22(e)]
+Cis branch: promoter sequence -1000 to +500 bp; 6 layers; gate initialised at c0 = -2 [status 4]
+Baselines: B4 has 17 features; B7a has 374 features; B7b has 375 features; bag = 5 members, each on 80% of training genes (2578 of 3222) [26 log lines 38-53]
