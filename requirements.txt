@@ -1,0 +1,16 @@
+# Python 3.11.16 | Linux-5.15.0-136-generic-x86_64-with-glibc2.35
+# torch build 2.5.1+cu121 | CUDA 12.1 | NVIDIA GeForce RTX 3090
+# --- required ---
+numpy==2.4.6
+pandas==3.0.6
+pyarrow==25.0.1
+scipy==1.17.1
+scikit-learn==1.9.1
+matplotlib==3.11.2
+openpyxl==3.1.5
+torch==2.5.1
+tokenizers==0.23.2
+pyBigWig==0.3.26
+# --- optional: 27 writes a .docx table, 30 counts PDF pages ---
+python-docx==1.2.0
+# pypdf  (not installed)
