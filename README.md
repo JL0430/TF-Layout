@@ -6,6 +6,11 @@ Long Jiang, Xiu-Hong Li\* — School of Computer Science and Technology, Xinjian
 (\*corresponding author) · ICBCB 2027 submission
 
 > Code, processed layout and label tables, the chromosome split, and per-pair test predictions for the paper.
+>
+> | Released | Not released |
+> |---|---|
+> | Code · processed layout / label / token tables · chromosome split · per-pair test predictions of the two reported models · frozen result tables · public auxiliary inputs in `data/` | ChEC-seq bigWig files (public at GEO, see [§6.2](#62-chec-seq-bigwig-files-not-included)) · trained checkpoints (retrain, see [§6.4](#64-model-checkpoints-not-released)) |
+>
 > Code comments, log messages and the `run_all.sh` header are written in Chinese.
 
 ---
@@ -52,7 +57,7 @@ Findings:
 
 ```mermaid
 flowchart TD
-    RAW[("data/ — ChEC-seq bigWig, Table S3,<br/>genome, motif PWMs, TPM means")]
+    RAW[("data/ — ChEC-seq bigWig (GEO, not in repo),<br/>Table S3, genome, motif PWMs, TPM means")]
 
     subgraph A["A · Data preparation (CPU)"]
         S01["01 parse Table S3"]
@@ -138,13 +143,21 @@ Experiment names are the presets in `CONFIG["experiments"]` of `18_run_experimen
 │   ├── figkit.py                  # drawing helpers for the paper figures
 │   ├── fig_paper_siamese.py       # Fig. 1
 │   └── fig_paper_within_tf.py     # Fig. 2
-├── data/                          # raw inputs — NOT tracked, see "Data"
-└── out/                           # generated; only small processed tables and frozen results are tracked
-    ├── tf_layout.parquet, head_bc_labels.parquet, head_a_baseline_logtpm.parquet, …
-    └── results/
-        ├── v8_headA_all/ , v11_wt_bc/     # per-pair predictions + metrics of the two reported models
-        ├── _paper/                        # tables.tex, paper_numbers.md, figures
-        └── _baselines/ , _compare*/ , _head_a_all*/ , _siamese_probe/ , _spec_control/ , …
+├── data/                          # public inputs, see "Data" (ChEC-seq bigWig files are NOT included)
+│   ├── 41586_2025_8916_MOESM5_ESM.xlsx
+│   ├── tpm/                       # wild-type and per-depletion expression summaries
+│   ├── motif/                     # JASPAR 2024 / YeTFaSCo PWMs
+│   ├── S288C.fsa, SGD_features.tab, tss.bed
+│   └── ChEC-seq/                  # only a README here; put the GEO bigWig files next to it to rebuild the layout
+├── out/                           # processed tables and frozen results (small files only)
+│   ├── tf_layout.parquet, head_bc_labels.parquet, head_a_baseline_logtpm.parquet, …
+│   └── results/
+│       ├── v8_headA_all/ , v11_wt_bc/     # per-pair predictions + metrics of the two reported models
+│       ├── _paper/                        # tables.tex, paper_numbers.md, figures
+│       └── _baselines/ , _compare*/ , _head_a_all*/ , _siamese_probe/ , _spec_control/ , …
+├── requirements.txt
+├── LICENSE
+└── README.md
 ```
 
 Scripts load each other by sibling path (e.g. `15` imports `10`/`12`/`14`), so keep all `NN_*.py` files together in `scripts/tflayout/`. Always run commands from the repository root.
@@ -156,23 +169,38 @@ python -m venv .venv && source .venv/bin/activate     # or conda
 pip install -r requirements.txt
 ```
 
-Python version, PyTorch/CUDA build and GPU used for the paper are listed at the top of `requirements.txt` . Training was run on a single RTX 3090 (24 GB); bf16 autocast is on by default. Data preparation, baselines, tables and figures need CPU only.
+Python version, PyTorch/CUDA build and GPU used for the paper are listed at the top of `requirements.txt`. Training was run on a single RTX 3090 (24 GB); bf16 autocast is on by default. Data preparation, baselines, tables and figures need CPU only.
 
 ## 6. Data
 
-**Raw inputs** (not redistributed; place under `data/`):
+Everything needed to train, evaluate and re-analyse the model is in this repository, with two exceptions: the **raw ChEC-seq bigWig files** (public at GEO, §6.2) and the **trained checkpoints** (§6.4).
+
+### 6.1 Public inputs included in `data/`
 
 | Path | Content | Source |
 |---|---|---|
-| `data/ChEC-seq/GSM*_<TF>_<A\|B\|C>.bw`, `GSM*_freeMNase_<A\|B>.bw` | ChEC-seq bigWig, 178 TFs + free-MNase control | GEO GSE236944 / GSE236947 (see the paper's Data section for which series holds what) |
 | `data/41586_2025_8916_MOESM5_ESM.xlsx` | Table S3 (sheets S3A binding, S3B occupancy, S3C log2FC) | Mahendrawada et al., *Nature* 642:796–804 (2025), supplementary data |
-| `data/tpm/DMSO_expression.txt`, `DMSO_mean.txt`, `3IAA_mean.txt` | Wild-type TPM (median over DMSO controls) and per-depletion replicate means | Derived from the depletion RNA-seq (GEO) —  |
+| `data/tpm/DMSO_expression.txt`, `DMSO_mean.txt`, `3IAA_mean.txt` | Wild-type TPM (median over DMSO controls) and per-depletion replicate means | ‹FILL 1: how these files were derived from the depletion RNA-seq, GEO GSE236947› |
 | `data/S288C.fsa` | *S. cerevisiae* reference genome (sacCer3 / S288C) | SGD / NCBI |
-| `data/SGD_features.tab` | SGD feature table (name → systematic name) | SGD |
-| `data/tss.bed` | Anchor coordinates (ORF start codon, not true TSS)  |
+| `data/SGD_features.tab` | SGD feature table (name → systematic name); also used for TF-name mapping in training and analysis | SGD |
+| `data/tss.bed` | Anchor coordinates: ORF start codon, **not** the true TSS | ‹FILL 2: how this file was produced and from which annotation› |
 | `data/motif/JASPAR2024_CORE_fungi_non-redundant_pfms_meme.txt`, `data/motif/ALIGNED_ENOLOGO_FORMAT_PWMS/` | Motif PWMs | JASPAR 2024, YeTFaSCo |
 
-**Processed data released with this repository** (so the model can be trained without the raw bigWigs):
+### 6.2 ChEC-seq bigWig files (not included)
+
+| Path | Content | Source |
+|---|---|---|
+| `data/ChEC-seq/GSM*_<TF>_<A\|B\|C>.bw`, `GSM*_freeMNase_<A\|B>.bw` | ChEC-seq coverage, 178 TFs in triplicate + free-MNase control | GEO [GSE236944](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE236944) (ChEC-seq). It belongs to SuperSeries [GSE236948](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE236948), which also contains the depletion RNA-seq (GSE236947) |
+
+These files are needed **only** to rebuild the layout table from raw signal (steps `01`–`04`). The processed layout in `out/` is enough for everything else. To rebuild it:
+
+1. Download the bigWig files from the supplementary files of GSE236944 and keep their original `GSM…` file names.
+2. Put them in `data/ChEC-seq/`.
+3. Run `bash scripts/tflayout/run_all.sh --force` (`--force` reruns steps whose output files already exist).
+
+### 6.3 Processed data released in `out/`
+
+These files let the model be trained and evaluated without the raw bigWigs.
 
 | File | Content |
 |---|---|
@@ -181,13 +209,27 @@ Python version, PyTorch/CUDA build and GPU used for the paper are listed at the 
 | `out/head_a_baseline_logtpm.parquet` | Per-gene Head A target and `split` (train / val / test; val = chrXIII/XIV, test = chrXV/XVI) |
 | `out/head_b_dense_target.parquet` | Auxiliary dense Head B target |
 | `out/bpe_tokenizer.json`, `out/promoter_token_ids.parquet`, `out/promoter_seq.parquet` | BPE tokenizer, tokenised promoters (cis branch input), promoter sequences (6-mer baseline in `26`) |
-| `out/results/v8_headA_all/predictions_test.parquet`, `out/results/v11_wt_bc/predictions_test.parquet` | Per-pair test predictions |
+| `out/results/v8_headA_all/predictions_test.parquet`, `out/results/v11_wt_bc/predictions_test.parquet` | Per-pair test predictions of the two reported models |
+| `out/results/_paper/`, `_baselines/`, `_compare*/`, `_head_a_all*/`, `_siamese_probe/`, `_spec_control/`, … | Frozen result tables behind the paper (tables, numbers, figures) |
 
-Training and the analysis scripts additionally read `data/SGD_features.tab` (TF-name mapping), which is a small public SGD file. Model checkpoints (5 seeds each for `v8_headA_all` and `v11_wt_bc`) are distributed separately rather than through git: **TODO: link to GitHub Release / Zenodo**.
+### 6.4 Model checkpoints (not released)
+
+Checkpoints are not distributed. The per-pair test predictions of the two reported models are included, so the numbers in the paper can be checked without retraining. To obtain checkpoints, retrain with the commands in §7 (5 seeds per model, ≈ 73 min per seed on one RTX 3090). Training is seeded, but results will differ slightly (see the note at the end of §7).
+
+### 6.5 What can be done with which inputs
+
+| Goal | Needs | Command | Time |
+|---|---|---|---|
+| Use the layout, labels, tokenised promoters and per-pair test predictions | this repository | any parquet reader (e.g. `pandas.read_parquet`) | — |
+| Regenerate paper tables and figures from the frozen results | CPU, this repository | `--tables`, then the two `fig_paper_*.py` | minutes |
+| Re-fit the baselines B2–B7 | CPU, this repository | `--baselines` | ≈ 40 min |
+| Retrain the models | GPU (RTX 3090, 24 GB) | `--experiments` | ≈ 73 min per seed |
+| Re-run the checkpoint-based analyses (`--export`, `--head-a-all`, `--probe`, `--spec-control`, `--pos-scan`) | checkpoints from your own training run | the switches in §7 | minutes |
+| Rebuild the layout table from raw signal | bigWig files from GEO (§6.2) | `--force` | — |
 
 ## 7. Usage
 
-`run_all.sh` is the single entry point. Steps whose output files already exist are skipped (`--force` reruns them); each step logs to `out/logs/<step>.log`. `--help` prints the script header (usage and change notes, in Chinese).
+`run_all.sh` is the single entry point. Steps whose output files already exist are skipped (`--force` reruns them); each step logs to `out/logs/<step>.log`. `--help` prints the script header (usage and change notes, in Chinese). On a fresh clone the processed outputs of steps `01`–`04` are already in `out/`, so those steps are skipped and `data/ChEC-seq/` is not needed.
 
 ```bash
 # 1. Data preparation (01–04, 08, 11, 13) + Dataset check + architecture self-tests
@@ -211,7 +253,7 @@ Other switches: `--export` (17), `--compare` (19), `--lto` / `--lto-diag` (22/23
 
 ### Reproducing the paper
 
-Approximate order, with GPU times as estimated in the script comments (≈ 1 h per seed on an RTX 3090):
+No GPU? The released predictions and frozen results let you regenerate the paper tables without retraining (§6.5). Approximate order for a full reproduction, with GPU times as estimated in the script comments (≈ 73 min per seed for the main model on an RTX 3090, as in the paper):
 
 1. Steps 1 and 3 above.
 2. Train `v8_headA_all` (plans `b8a_headA_all`, `b8b_headA_all5`), the `v10_*` ablations (`b10a_ablate_v8`, `b10b_lambda_a`, `b11a_knockout5`) and `v11_wt_bc` (`b12b_wt_main5`) by setting `ACTIVE_PLAN` and running `--experiments`.
@@ -226,16 +268,24 @@ Training is seeded (42, 123, 456, 789, 2024), but bf16 and GPU kernels are not b
 
 ```bibtex
 @misc{jiang2027tflayout,
-  title  = {Predicting Gene Responses to Transcription Factor Depletion from Promoter Binding Layouts in Yeast},
-  author = {Jiang, Long and Li, Xiu-Hong},
-  note   = {Under review. TODO: update after acceptance}
+  title        = {Predicting Gene Responses to Transcription Factor Depletion from Promoter Binding Layouts in Yeast},
+  author       = {Jiang, Long and Li, Xiu-Hong},
+  howpublished = {\url{https://github.com/JL0430/TF-Layout}},
+  note         = {Manuscript under review; the citation will be updated after publication}
 }
 ```
 
-If you use the data, please also cite Mahendrawada, Warfield, Donczew and Hahn, *Nature* 642(8068):796–804 (2025).
+If you use the data, please also cite the sources of the inputs:
+
+- Mahendrawada, Warfield, Donczew and Hahn, *Nature* 642(8068):796–804 (2025) — ChEC-seq binding maps, depletion RNA-seq, Table S3.
+- Rauluseviciute et al., JASPAR 2024, *Nucleic Acids Res.* 52(D1):D174–D182 (2024) — motif matrices.
+- de Boer and Hughes, YeTFaSCo, *Nucleic Acids Res.* 40(D1):D169–D179 (2012) — motif matrices.
+- Saccharomyces Genome Database (yeastgenome.org) — reference genome and feature table.
 
 ## 9. License and acknowledgment
 
-**TODO: choose a license** (code) — the processed tables derive from public data; keep the source licenses in mind.
+**Code** (`scripts/`) is released under the MIT License, see `LICENSE`.
+
+**Data.** The processed tables in `out/` are derived from the public sources listed in §6 and are provided for research reproducibility. Third-party files in `data/` (Table S3, motif matrices, genome, annotation) keep the terms of their original sources; please follow those terms and cite the sources (§8).
 
 We thank Mahendrawada et al. for making their data public. LLM assistants (Claude and ChatGPT) helped draft the analysis code and edit the text; the authors verified all content and take full responsibility for it.
